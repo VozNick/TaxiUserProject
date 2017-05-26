@@ -1,0 +1,18 @@
+<resources>
+    <string name="app_name">TaxiUserProject</string>
+    <string name="hint_login">Mobile number or email</string>
+    <string name="hint_password">Password</string>
+    <string name="btn_text_login">Login</string>
+    <string name="tv_link_sign_up">No account yet? Create one</string>
+    <string name="tv_link_forget_password">forget password</string>
+    <string name="hint_name">Name</string>
+    <string name="hint_last_name">Last Name</string>
+    <string name="hint_phone">Phone</string>
+    <string name="hint_email">Email</string>
+    <string name="hint_conf_password">Confirm Password</string>
+    <string name="btn_create_account">Create Account</string>
+    <string name="tv_link_login">Already a member? Login</string>
+
+    <item name="visible" type="id" />
+    <item name="masked" type="id" />
+</resources>
