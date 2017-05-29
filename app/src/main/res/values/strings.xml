@@ -1,6 +1,6 @@
 <resources>
     <string name="app_name">TaxiUserProject</string>
-    <string name="hint_login">Mobile number or email</string>
+    <string name="hint_login">Email</string>
     <string name="hint_password">Password</string>
     <string name="btn_text_login">Login</string>
     <string name="tv_link_sign_up">No account yet? Create one</string>
@@ -15,4 +15,11 @@
 
     <item name="visible" type="id" />
     <item name="masked" type="id" />
+
+    <array name="sp_sex">
+        <item>sex</item>
+        <item>male</item>
+        <item>fimale</item>
+    </array>
+
 </resources>

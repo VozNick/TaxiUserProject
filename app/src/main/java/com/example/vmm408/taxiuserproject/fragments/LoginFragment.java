@@ -10,22 +10,28 @@ import android.view.View;
 import android.view.ViewGroup;
 import android.widget.EditText;
 
+import com.example.vmm408.taxiuserproject.AuthenticationActivity;
 import com.example.vmm408.taxiuserproject.MainActivity;
 import com.example.vmm408.taxiuserproject.R;
+import com.example.vmm408.taxiuserproject.models.UserModel;
+import com.google.firebase.database.DataSnapshot;
+import com.google.firebase.database.DatabaseError;
+import com.google.firebase.database.ValueEventListener;
 
 import butterknife.BindView;
 import butterknife.OnClick;
 
-public class LoginFragment extends BaseFragment {
+public class LoginFragment extends BaseFragment implements ValueEventListener {
     public static LoginFragment newInstance() {
         return new LoginFragment();
     }
 
-    @BindView(R.id.et_login)
+    private static final String TAG = "LoginFragment";
+    @BindView(R.id.edit_text_login)
     EditText etLogin;
-    @BindView(R.id.et_password)
+    @BindView(R.id.edit_text_password)
     EditText etPassword;
-    private ProgressDialog progressDialog;
+//    private ProgressDialog progressDialog;
 
     @Nullable
     @Override
@@ -40,57 +46,79 @@ public class LoginFragment extends BaseFragment {
         super.onViewCreated(view, savedInstanceState);
     }
 
-    @OnClick(R.id.tv_link_forget_password)
+    @OnClick(R.id.text_link_forget_password)
     public void tvLinkForgetPassword() {
-        System.out.println("forget");
+        // write code here
     }
 
-    @OnClick(R.id.tv_link_sign_up)
+    @OnClick(R.id.text_link_sign_up)
     public void tvLinkSignUp() {
-        System.out.println("good");
+        ((AuthenticationActivity) getActivity()).changeFragment(SignUpFragment.newInstance());
     }
 
     @OnClick(R.id.btn_login)
     public void btnLogin() {
         if (super.validate(etLogin) && super.validate(etPassword)) {
-            initProgressDialog();
-            new CheckUserInBase().execute();
+//            initProgressDialog();
+//            new CheckUserInBase().execute();
+            checkUserInBase();
+        }
+    }
+//
+//    private void initProgressDialog() {
+//        progressDialog = new ProgressDialog(getActivity());
+//        progressDialog.setMessage("Authenticating...");
+//    }
+
+//    private class CheckUserInBase extends AsyncTask<Void, Void, Void>{
+//        @Override
+//        protected void onPreExecute() {
+//            etLogin.setEnabled(false);
+//            progressDialog.show();
+//        }
+//
+//        @Override
+//        protected void doInBackground(Void... params) {
+//            checkUserInBase();
+//        }
+//
+//        @Override
+//        protected void onPostExecute(Boolean userExists) {
+//            progressDialog.dismiss();
+//            etLogin.setEnabled(true);
+//            if (userExists) {
+//                startActivity(new Intent(getActivity(), MainActivity.class));
+//            } else {
+//                etLogin.setError("user doesn't exists");
+//            }
+//        }
+
+    private void checkUserInBase() {
+        reference = database.getReference("users").child("child");
+        reference.addListenerForSingleValueEvent(this);
+    }
+
+    @Override
+    public void onDataChange(DataSnapshot dataSnapshot) {
+        try {
+            UserModel.User.setUserModel(gson.fromJson(
+                    String.valueOf(dataSnapshot.getValue().toString()), UserModel.class));
+            checkPassword();
+        } catch (NullPointerException e) {
+            makeToast("invalid email / password");
         }
     }
 
-    private void initProgressDialog() {
-        progressDialog = new ProgressDialog(getActivity());
-        progressDialog.setMessage("Authenticating...");
+    @Override
+    public void onCancelled(DatabaseError databaseError) {
+
     }
 
-    private class CheckUserInBase extends AsyncTask<Void, Void, Boolean> {
-        @Override
-        protected void onPreExecute() {
-            etLogin.setEnabled(false);
-            progressDialog.show();
+    private void checkPassword() {
+        if (UserModel.User.getUserModel().getPasswordUser()
+                .equals(etPassword.getText().toString())) {
+            startActivity(new Intent(getActivity(), MainActivity.class));
         }
-
-        @Override
-        protected Boolean doInBackground(Void... params) {
-            return findUserInBase(etLogin, etPassword);
-        }
-
-        @Override
-        protected void onPostExecute(Boolean userExists) {
-            progressDialog.dismiss();
-            etLogin.setEnabled(true);
-            if (userExists) {
-                CategoryModel.Category.setCategoryModelList(initList());
-                startActivity(new Intent(getActivity(), MainActivity.class));
-            } else {
-                etLogin.setError("user doesn't exists");
-            }
-        }
-
-        private RealmList<CategoryModel> initList() {
-            RealmList<CategoryModel> categoryModelRealmList = new RealmList<>();
-            categoryModelRealmList.addAll(findCategoryInBase());
-            return categoryModelRealmList;
-        }
+        makeToast("invalid email / password");
     }
 }
