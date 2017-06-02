@@ -1,6 +1,7 @@
 package com.example.vmm408.taxiuserproject.fragments;
 
 import android.app.ProgressDialog;
+import android.content.Intent;
 import android.os.AsyncTask;
 import android.os.Bundle;
 import android.support.annotation.Nullable;
@@ -12,6 +13,9 @@ import android.widget.Spinner;
 
 import com.example.vmm408.taxiuserproject.AuthenticationActivity;
 import com.example.vmm408.taxiuserproject.R;
+import com.example.vmm408.taxiuserproject.models.UserModel;
+
+import java.util.Random;
 
 import butterknife.BindView;
 import butterknife.OnClick;
@@ -22,7 +26,6 @@ public class SignUpFragment extends BaseFragment {
         return new SignUpFragment();
     }
 
-    private static final String TAG = "SignUpFragment";
     @BindView(R.id.image_user_avatar)
     CircleImageView imageUserAvatar;
     @BindView(R.id.edit_text_name)
@@ -63,49 +66,72 @@ public class SignUpFragment extends BaseFragment {
 
     @OnClick(R.id.btn_create_account)
     public void btnCreateAccount() {
-//        if (super.validate(etLogin) && super.validate(etPassword)) {
-//            initProgressDialog();
-//            new LoginFragment.CheckUserInBase().execute();
-//        }
+        if (super.validate(etName) &&
+                super.validate(etLastName) &&
+                super.validate(spinnerSex.getSelectedItemPosition()) &&
+                super.validate(spinnerSex.getSelectedItemPosition()) &&
+                super.validate(etPassword) &&
+                etPassword.getText().toString().equals(etConfirmPassword.getText().toString())) {
+            initProgressDialog();
+            new CheckUserInBase().execute();
+        }
     }
-//
-//    private void initProgressDialog() {
-//        progressDialog = new ProgressDialog(getActivity());
-//        progressDialog.setMessage("Authenticating...");
-//    }
-//
-//    private class checkUserInBase extends AsyncTask<Void, Void, Boolean> {
-//        @Override
-//        protected void onPreExecute() {
+
+    private void initProgressDialog() {
+        progressDialog = new ProgressDialog(getActivity());
+        progressDialog.setMessage("Registration...");
+    }
+
+    private class CheckUserInBase extends AsyncTask<Void, Void, Boolean> {
+        @Override
+        protected void onPreExecute() {
 //            etLogin.setEnabled(false);
-//            progressDialog.show();
-//        }
-//
-//        @Override
-//        protected Boolean doInBackground(Void... params) {
-//            return findUserInBase(etLogin);
-//        }
-//
-//        @Override
-//        protected void onPostExecute(Boolean noUserInBase) {
-//            progressDialog.dismiss();
-//            etLogin.setEnabled(true);
-//            if (noUserInBase) {
-//                saveToBase(newUser());
-//                startActivity(new Intent(getActivity(), SecondActivity.class));
-//            } else {
-//                etLogin.setError("user already exists");
-//            }
-//        }
-//
-//        private UserModel newUser() {
-//            return new UserModel(Realm.getDefaultInstance()
-//                    .where(UserModel.class).findAll().size() + 1,
-//                    etLogin.getText().toString(),
-//                    etPassword.getText().toString(),
-//                    etName.getText().toString(),
-//                    etLastName.getText().toString());
-//        }
-//    }
+            progressDialog.show();
+        }
+
+        @Override
+        protected Boolean doInBackground(Void... params) {
+            if (checkInBase(etEmail, etPhone)) {
+                etEmail.setError("User already exists");
+                return false;
+            } else {
+                // reg user
+                return true;
+            }
+        }
+
+        @Override
+        protected void onPostExecute(Boolean noUserInBase) {
+            progressDialog.dismiss();
+            etLogin.setEnabled(true);
+            if (noUserInBase) {
+                saveToBase(newUser());
+                startActivity(new Intent(getActivity(), SecondActivity.class));
+            } else {
+                etLogin.setError("user already exists");
+            }
+        }
+
+        private UserModel newUser() {
+            return new UserModel(new Random().nextInt(),
+                    R.mipmap.ic_launcher,
+                    etName.getText().toString(),
+                    etLastName.getText().toString(),
+                    sex(),
+                    Integer.parseInt(spinnerAge.getSelectedItem().toString()),
+                    Integer.parseInt(etPhone.getText().toString()),
+                    etEmail.getText().toString(),
+                    etPassword.getText().toString(),
+                    "",
+                    0,
+                    0.0,
+                    "",
+                    "");
+        }
+
+        private boolean sex() {
+            return spinnerSex.getSelectedItemPosition() == 1;
+        }
+    }
 
 }

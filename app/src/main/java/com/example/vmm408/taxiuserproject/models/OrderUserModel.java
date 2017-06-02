@@ -12,5 +12,5 @@ public class OrderUserModel {
 
     private UserModel userModel;
     private UserLocationModel userLocationModel;
-    private DriverLocationModel driverLocationModel;
+    private UserOrderStatusModel userOrderStatusModel;
 }

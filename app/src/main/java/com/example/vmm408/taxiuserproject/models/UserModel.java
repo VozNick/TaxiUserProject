@@ -13,8 +13,13 @@ public class UserModel {
     private int phoneUser;
     private String emailUser;
     private String passwordUser;
+
     private String commentsUser;
     private int ratingsUser;
+
+    private double experienceDriver;
+    private String carModelDriver;
+    private String numPlateCarDriver;
 
     private List<OrderUserModel> orderUserModelList = new ArrayList<>();
 
@@ -31,7 +36,13 @@ public class UserModel {
                      String emailUser,
                      String passwordUser,
                      String commentsUser,
-                     int ratingsUser) {
+                     int ratingsUser,
+                     double experienceDriver,
+                     String carModelDriver,
+                     String numPlateCarDriver
+//            ,
+//                     List<OrderUserModel> orderUserModelList
+    ) {
         this.idUser = idUser;
         this.avatarUser = avatarUser;
         this.nameUser = nameUser;
@@ -43,6 +54,10 @@ public class UserModel {
         this.passwordUser = passwordUser;
         this.commentsUser = commentsUser;
         this.ratingsUser = ratingsUser;
+        this.experienceDriver = experienceDriver;
+        this.carModelDriver = carModelDriver;
+        this.numPlateCarDriver = numPlateCarDriver;
+        this.orderUserModelList = orderUserModelList;
     }
 
     public void setIdUser(int idUser) {
@@ -131,6 +146,38 @@ public class UserModel {
 
     public int getRatingsUser() {
         return ratingsUser;
+    }
+
+    public void setExperienceDriver(double experienceDriver) {
+        this.experienceDriver = experienceDriver;
+    }
+
+    public double getExperienceDriver() {
+        return experienceDriver;
+    }
+
+    public void setCarModelDriver(String carModelDriver) {
+        this.carModelDriver = carModelDriver;
+    }
+
+    public String getCarModelDriver() {
+        return carModelDriver;
+    }
+
+    public void setNumPlateCarDriver(String numPlateCarDriver) {
+        this.numPlateCarDriver = numPlateCarDriver;
+    }
+
+    public String getNumPlateCarDriver() {
+        return numPlateCarDriver;
+    }
+
+    public void setOrderUserModelList(List<OrderUserModel> orderUserModelList) {
+        this.orderUserModelList = orderUserModelList;
+    }
+
+    public List<OrderUserModel> getOrderUserModelList() {
+        return orderUserModelList;
     }
 
     public static class User {

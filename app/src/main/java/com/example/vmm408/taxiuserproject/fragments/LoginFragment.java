@@ -2,7 +2,6 @@ package com.example.vmm408.taxiuserproject.fragments;
 
 import android.app.ProgressDialog;
 import android.content.Intent;
-import android.os.AsyncTask;
 import android.os.Bundle;
 import android.support.annotation.Nullable;
 import android.view.LayoutInflater;
@@ -16,6 +15,7 @@ import com.example.vmm408.taxiuserproject.R;
 import com.example.vmm408.taxiuserproject.models.UserModel;
 import com.google.firebase.database.DataSnapshot;
 import com.google.firebase.database.DatabaseError;
+import com.google.firebase.database.DatabaseReference;
 import com.google.firebase.database.ValueEventListener;
 
 import butterknife.BindView;
@@ -26,12 +26,11 @@ public class LoginFragment extends BaseFragment implements ValueEventListener {
         return new LoginFragment();
     }
 
-    private static final String TAG = "LoginFragment";
     @BindView(R.id.edit_text_login)
     EditText etLogin;
     @BindView(R.id.edit_text_password)
     EditText etPassword;
-//    private ProgressDialog progressDialog;
+    private ProgressDialog progressDialog;
 
     @Nullable
     @Override
@@ -94,8 +93,8 @@ public class LoginFragment extends BaseFragment implements ValueEventListener {
 //        }
 
     private void checkUserInBase() {
-        reference = database.getReference("users").child("child");
-        reference.addListenerForSingleValueEvent(this);
+        mReference = (DatabaseReference) mDatabase.getReference("users").child("login").equalTo(etLogin.getText().toString());
+        mReference.addListenerForSingleValueEvent(this);
     }
 
     @Override
