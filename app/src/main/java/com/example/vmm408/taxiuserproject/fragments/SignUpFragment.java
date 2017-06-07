@@ -92,7 +92,7 @@ public class SignUpFragment extends BaseFragment {
         @Override
         protected Boolean doInBackground(Void... params) {
             if (checkInBase(etEmail, etPhone)) {
-                etEmail.setError("User already exists");
+//                etEmail.setError("User already exists");
                 return false;
             } else {
                 // reg user
@@ -102,32 +102,32 @@ public class SignUpFragment extends BaseFragment {
 
         @Override
         protected void onPostExecute(Boolean noUserInBase) {
-            progressDialog.dismiss();
-            etLogin.setEnabled(true);
-            if (noUserInBase) {
-                saveToBase(newUser());
-                startActivity(new Intent(getActivity(), SecondActivity.class));
-            } else {
-                etLogin.setError("user already exists");
-            }
+//            progressDialog.dismiss();
+//            etLogin.setEnabled(true);
+//            if (noUserInBase) {
+//                saveToBase(newUser());
+//                startActivity(new Intent(getActivity(), SecondActivity.class));
+//            } else {
+//                etLogin.setError("user already exists");
+//            }
         }
 
-        private UserModel newUser() {
-            return new UserModel(new Random().nextInt(),
-                    R.mipmap.ic_launcher,
-                    etName.getText().toString(),
-                    etLastName.getText().toString(),
-                    sex(),
-                    Integer.parseInt(spinnerAge.getSelectedItem().toString()),
-                    Integer.parseInt(etPhone.getText().toString()),
-                    etEmail.getText().toString(),
-                    etPassword.getText().toString(),
-                    "",
-                    0,
-                    0.0,
-                    "",
-                    "");
-        }
+//        private UserModel newUser() {
+//            return new UserModel(new Random().nextInt(),
+//                    R.mipmap.ic_launcher,
+//                    etName.getText().toString(),
+//                    etLastName.getText().toString(),
+//                    sex(),
+//                    Integer.parseInt(spinnerAge.getSelectedItem().toString()),
+//                    Integer.parseInt(etPhone.getText().toString()),
+//                    etEmail.getText().toString(),
+//                    etPassword.getText().toString(),
+//                    "",
+//                    0,
+//                    0.0,
+//                    "",
+//                    "");
+//        }
 
         private boolean sex() {
             return spinnerSex.getSelectedItemPosition() == 1;

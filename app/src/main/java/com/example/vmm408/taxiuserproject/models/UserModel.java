@@ -13,52 +13,13 @@ public class UserModel {
     private int phoneUser;
     private String emailUser;
     private String passwordUser;
-
     private String commentsUser;
     private int ratingsUser;
-
     private double experienceDriver;
     private String carModelDriver;
     private String numPlateCarDriver;
 
     private List<OrderUserModel> orderUserModelList = new ArrayList<>();
-
-    public UserModel() {
-    }
-
-    public UserModel(int idUser,
-                     int avatarUser,
-                     String nameUser,
-                     String lastNameUser,
-                     boolean sexUser,
-                     int ageUser,
-                     int phoneUser,
-                     String emailUser,
-                     String passwordUser,
-                     String commentsUser,
-                     int ratingsUser,
-                     double experienceDriver,
-                     String carModelDriver,
-                     String numPlateCarDriver
-//            ,
-//                     List<OrderUserModel> orderUserModelList
-    ) {
-        this.idUser = idUser;
-        this.avatarUser = avatarUser;
-        this.nameUser = nameUser;
-        this.lastNameUser = lastNameUser;
-        this.sexUser = sexUser;
-        this.ageUser = ageUser;
-        this.phoneUser = phoneUser;
-        this.emailUser = emailUser;
-        this.passwordUser = passwordUser;
-        this.commentsUser = commentsUser;
-        this.ratingsUser = ratingsUser;
-        this.experienceDriver = experienceDriver;
-        this.carModelDriver = carModelDriver;
-        this.numPlateCarDriver = numPlateCarDriver;
-        this.orderUserModelList = orderUserModelList;
-    }
 
     public void setIdUser(int idUser) {
         this.idUser = idUser;

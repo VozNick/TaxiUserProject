@@ -21,7 +21,7 @@ import com.google.firebase.database.ValueEventListener;
 import butterknife.BindView;
 import butterknife.OnClick;
 
-public class LoginFragment extends BaseFragment implements ValueEventListener {
+public class LoginFragment extends BaseFragment {
     public static LoginFragment newInstance() {
         return new LoginFragment();
     }
@@ -57,65 +57,51 @@ public class LoginFragment extends BaseFragment implements ValueEventListener {
 
     @OnClick(R.id.btn_login)
     public void btnLogin() {
-        if (super.validate(etLogin) && super.validate(etPassword)) {
-//            initProgressDialog();
-//            new CheckUserInBase().execute();
+        if (super.validate(etLogin)
+//                && super.validate(etPassword)
+                ) {
+            initProgressDialog();
             checkUserInBase();
         }
     }
-//
-//    private void initProgressDialog() {
-//        progressDialog = new ProgressDialog(getActivity());
-//        progressDialog.setMessage("Authenticating...");
-//    }
 
-//    private class CheckUserInBase extends AsyncTask<Void, Void, Void>{
-//        @Override
-//        protected void onPreExecute() {
-//            etLogin.setEnabled(false);
-//            progressDialog.show();
-//        }
-//
-//        @Override
-//        protected void doInBackground(Void... params) {
-//            checkUserInBase();
-//        }
-//
-//        @Override
-//        protected void onPostExecute(Boolean userExists) {
-//            progressDialog.dismiss();
-//            etLogin.setEnabled(true);
-//            if (userExists) {
-//                startActivity(new Intent(getActivity(), MainActivity.class));
-//            } else {
-//                etLogin.setError("user doesn't exists");
-//            }
-//        }
+    private void initProgressDialog() {
+        progressDialog = new ProgressDialog(getActivity());
+        progressDialog.setMessage("Authenticating...");
+        etLogin.setEnabled(false);
+        progressDialog.show();
+    }
 
     private void checkUserInBase() {
-        mReference = (DatabaseReference) mDatabase.getReference("users").child("login").equalTo(etLogin.getText().toString());
-        mReference.addListenerForSingleValueEvent(this);
-    }
+        mReference = mDatabase.getReference("users");
+        mReference.addListenerForSingleValueEvent(new ValueEventListener() {
+            @Override
+            public void onDataChange(DataSnapshot dataSnapshot) {
+                if (dataSnapshot.getChildren().iterator().equals(etLogin.getText().toString())) {
+                    System.out.println("good");
+                }
+                try {
+                    UserModel.User.setUserModel(dataSnapshot.getValue(UserModel.class));
+                    checkPassword();
+                } catch (NullPointerException e) {
+                    progressDialog.dismiss();
+                    etLogin.setEnabled(true);
+                    makeToast("invalid email / password");
+                }
+            }
 
-    @Override
-    public void onDataChange(DataSnapshot dataSnapshot) {
-        try {
-            UserModel.User.setUserModel(gson.fromJson(
-                    String.valueOf(dataSnapshot.getValue().toString()), UserModel.class));
-            checkPassword();
-        } catch (NullPointerException e) {
-            makeToast("invalid email / password");
-        }
-    }
+            @Override
+            public void onCancelled(DatabaseError databaseError) {
 
-    @Override
-    public void onCancelled(DatabaseError databaseError) {
-
+            }
+        });
     }
 
     private void checkPassword() {
         if (UserModel.User.getUserModel().getPasswordUser()
                 .equals(etPassword.getText().toString())) {
+            progressDialog.dismiss();
+            etLogin.setEnabled(true);
             startActivity(new Intent(getActivity(), MainActivity.class));
         }
         makeToast("invalid email / password");

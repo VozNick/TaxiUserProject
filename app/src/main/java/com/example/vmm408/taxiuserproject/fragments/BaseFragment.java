@@ -6,7 +6,6 @@ import android.support.v4.app.Fragment;
 import android.util.Patterns;
 import android.view.View;
 import android.widget.EditText;
-import android.widget.Spinner;
 import android.widget.Toast;
 
 import com.example.vmm408.taxiuserproject.R;
@@ -21,7 +20,6 @@ import butterknife.Unbinder;
 
 public class BaseFragment extends Fragment {
     private Unbinder unbinder;
-    protected Gson gson;
     protected FirebaseDatabase mDatabase;
     protected DatabaseReference mReference;
 
@@ -42,8 +40,7 @@ public class BaseFragment extends Fragment {
         if (editText.getId() == R.id.edit_text_login) {
             String login = editText.getText().toString();
             if (login.isEmpty() ||
-                    !Patterns.EMAIL_ADDRESS.matcher(login).matches() ||
-                    !Patterns.PHONE.matcher(login).matches()) {
+                    !Patterns.EMAIL_ADDRESS.matcher(login).matches()) {
                 editText.setError("wrong email");
                 return false;
             }
