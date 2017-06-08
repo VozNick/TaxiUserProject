@@ -8,18 +8,17 @@ public class UserModel {
     private int avatarUser;
     private String nameUser;
     private String lastNameUser;
-    private boolean sexUser;
+    private String sexUser;
     private int ageUser;
-    private int phoneUser;
+    private String phoneUser;
     private String emailUser;
     private String passwordUser;
-    private String commentsUser;
-    private int ratingsUser;
     private double experienceDriver;
     private String carModelDriver;
     private String numPlateCarDriver;
 
-    private List<OrderUserModel> orderUserModelList = new ArrayList<>();
+    private List<OrderModel> orderModelList = new ArrayList<>();
+    private List<RatingModel> ratingModelList = new ArrayList<>();
 
     public void setIdUser(int idUser) {
         this.idUser = idUser;
@@ -53,11 +52,11 @@ public class UserModel {
         return lastNameUser;
     }
 
-    public void setSexUser(boolean sexUser) {
+    public void setSexUser(String sexUser) {
         this.sexUser = sexUser;
     }
 
-    public boolean isSexUser() {
+    public String isSexUser() {
         return sexUser;
     }
 
@@ -69,11 +68,11 @@ public class UserModel {
         return ageUser;
     }
 
-    public void setPhoneUser(int phoneUser) {
+    public void setPhoneUser(String phoneUser) {
         this.phoneUser = phoneUser;
     }
 
-    public int getPhoneUser() {
+    public String getPhoneUser() {
         return phoneUser;
     }
 
@@ -91,22 +90,6 @@ public class UserModel {
 
     public String getPasswordUser() {
         return passwordUser;
-    }
-
-    public void setCommentsUser(String commentsUser) {
-        this.commentsUser = commentsUser;
-    }
-
-    public String getCommentsUser() {
-        return commentsUser;
-    }
-
-    public void setRatingsUser(int ratingsUser) {
-        this.ratingsUser = ratingsUser;
-    }
-
-    public int getRatingsUser() {
-        return ratingsUser;
     }
 
     public void setExperienceDriver(double experienceDriver) {
@@ -133,12 +116,20 @@ public class UserModel {
         return numPlateCarDriver;
     }
 
-    public void setOrderUserModelList(List<OrderUserModel> orderUserModelList) {
-        this.orderUserModelList = orderUserModelList;
+    public void setOrderModelList(List<OrderModel> orderModelList) {
+        this.orderModelList = orderModelList;
     }
 
-    public List<OrderUserModel> getOrderUserModelList() {
-        return orderUserModelList;
+    public List<OrderModel> getOrderModelList() {
+        return orderModelList;
+    }
+
+    public void setRatingModelList(List<RatingModel> ratingModelList) {
+        this.ratingModelList = ratingModelList;
+    }
+
+    public List<RatingModel> getRatingModelList() {
+        return ratingModelList;
     }
 
     public static class User {

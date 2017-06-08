@@ -12,6 +12,7 @@ import com.example.vmm408.taxiuserproject.R;
 import com.google.firebase.database.DatabaseReference;
 import com.google.firebase.database.FirebaseDatabase;
 import com.google.gson.Gson;
+import com.google.gson.GsonBuilder;
 
 import java.util.regex.Pattern;
 
@@ -22,6 +23,7 @@ public class BaseFragment extends Fragment {
     private Unbinder unbinder;
     protected FirebaseDatabase mDatabase;
     protected DatabaseReference mReference;
+    protected Gson gson = new GsonBuilder().create();
 
     @Override
     public void onViewCreated(View view, @Nullable Bundle savedInstanceState) {
@@ -40,7 +42,8 @@ public class BaseFragment extends Fragment {
         if (editText.getId() == R.id.edit_text_login) {
             String login = editText.getText().toString();
             if (login.isEmpty() ||
-                    !Patterns.EMAIL_ADDRESS.matcher(login).matches()) {
+                    (!Patterns.EMAIL_ADDRESS.matcher(login).matches() &&
+                            !Patterns.PHONE.matcher(login).matches())) {
                 editText.setError("wrong email");
                 return false;
             }
@@ -57,8 +60,14 @@ public class BaseFragment extends Fragment {
         return true;
     }
 
-    protected boolean checkInBase(EditText email, EditText phone) {
-        return true; // find in base for duplicates
+    private boolean isValidPassword(String password) {
+        if (Pattern.compile("([A-Za-z0-9]){6,15}").matcher(password).matches()) {
+            if (Pattern.compile("([A-Z])+").matcher(password).find()
+                    && Pattern.compile("([0-9])+").matcher(password).find()) {
+                return true;
+            }
+        }
+        return false;
     }
 
     protected boolean validate(int position) {
@@ -71,16 +80,5 @@ public class BaseFragment extends Fragment {
 
     protected void makeToast(String string) {
         Toast.makeText(getActivity(), string, Toast.LENGTH_SHORT).show();
-    }
-
-    private boolean isValidPassword(String password) {
-        boolean isValid = false;
-        if (Pattern.compile("([A-Za-z0-9]){6,15}").matcher(password).matches()) {
-            if (Pattern.compile("([A-Z])+").matcher(password).find()
-                    && Pattern.compile("([0-9])+").matcher(password).find()) {
-                isValid = true;
-            }
-        }
-        return isValid;
     }
 }

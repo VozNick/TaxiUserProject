@@ -15,7 +15,6 @@ import com.example.vmm408.taxiuserproject.R;
 import com.example.vmm408.taxiuserproject.models.UserModel;
 import com.google.firebase.database.DataSnapshot;
 import com.google.firebase.database.DatabaseError;
-import com.google.firebase.database.DatabaseReference;
 import com.google.firebase.database.ValueEventListener;
 
 import butterknife.BindView;
@@ -57,53 +56,53 @@ public class LoginFragment extends BaseFragment {
 
     @OnClick(R.id.btn_login)
     public void btnLogin() {
-        if (super.validate(etLogin)
-//                && super.validate(etPassword)
-                ) {
+        if (super.validate(etLogin) && super.validate(etPassword)) {
             initProgressDialog();
-            checkUserInBase();
+            getUserFromBase();
         }
     }
 
     private void initProgressDialog() {
         progressDialog = new ProgressDialog(getActivity());
         progressDialog.setMessage("Authenticating...");
-        etLogin.setEnabled(false);
         progressDialog.show();
     }
 
-    private void checkUserInBase() {
+    private void getUserFromBase() {
         mReference = mDatabase.getReference("users");
-        mReference.addListenerForSingleValueEvent(new ValueEventListener() {
+        mReference.addValueEventListener(new ValueEventListener() {
             @Override
             public void onDataChange(DataSnapshot dataSnapshot) {
-                if (dataSnapshot.getChildren().iterator().equals(etLogin.getText().toString())) {
-                    System.out.println("good");
-                }
-                try {
-                    UserModel.User.setUserModel(dataSnapshot.getValue(UserModel.class));
-                    checkPassword();
-                } catch (NullPointerException e) {
+                for (DataSnapshot snapshot : dataSnapshot.getChildren()) {
+                    if (UserExistInBase(snapshot)) {
+                        saveUser(snapshot);
+                        startActivity(new Intent(getActivity(), MainActivity.class));
+                    } else {
+                        makeToast("invalid email / password");
+                    }
                     progressDialog.dismiss();
-                    etLogin.setEnabled(true);
-                    makeToast("invalid email / password");
                 }
             }
 
             @Override
             public void onCancelled(DatabaseError databaseError) {
-
+                progressDialog.dismiss();
             }
         });
     }
 
-    private void checkPassword() {
-        if (UserModel.User.getUserModel().getPasswordUser()
-                .equals(etPassword.getText().toString())) {
-            progressDialog.dismiss();
-            etLogin.setEnabled(true);
-            startActivity(new Intent(getActivity(), MainActivity.class));
-        }
-        makeToast("invalid email / password");
+    private boolean UserExistInBase(DataSnapshot dataSnapshot) {
+        return etLogin.getText().toString().equals(gson.fromJson(
+                dataSnapshot.getValue().toString(), UserModel.class).getEmailUser()) &&
+                etLogin.getText().toString().equals(gson.fromJson(
+                        dataSnapshot.getValue().toString(), UserModel.class).getPhoneUser()) &&
+                etPassword.getText().toString().equals(gson.fromJson(
+                        dataSnapshot.getValue().toString(), UserModel.class).getPasswordUser());
+    }
+
+    private void saveUser(DataSnapshot dataSnapshot) {
+        UserModel.User.setUserModel(gson.fromJson(
+                dataSnapshot.getValue().toString(), UserModel.class));
+        UserModel.User.getUserModel().setIdUser(Integer.parseInt(dataSnapshot.getKey()));
     }
 }
