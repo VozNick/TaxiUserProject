@@ -44,13 +44,28 @@ public class BaseFragment extends Fragment {
             if (login.isEmpty() ||
                     (!Patterns.EMAIL_ADDRESS.matcher(login).matches() &&
                             !Patterns.PHONE.matcher(login).matches())) {
-                editText.setError("wrong email");
+                editText.setError("wrong email or phone");
+                return false;
+            }
+        } else if (editText.getId() == R.id.edit_text_email) {
+            String email = editText.getText().toString();
+            if (email.isEmpty() ||
+                    (!Patterns.EMAIL_ADDRESS.matcher(email).matches())) {
+                editText.setError("wrong email format");
+                return false;
+            }
+        } else if (editText.getId() == R.id.edit_text_phone) {
+            String phone = editText.getText().toString();
+            if (phone.isEmpty() ||
+                    (!Patterns.PHONE.matcher(phone).matches())) {
+                editText.setError("wrong phone format");
                 return false;
             }
         } else if (editText.getId() == R.id.edit_text_password) {
             String password = editText.getText().toString();
             if (!isValidPassword(password)) {
-                editText.setError("password must be between 4 and 10 chars");
+                editText.setError("password must be between 6 and 15 chars. " +
+                        "Must contain numbers, chars and at least one capital letter");
                 return false;
             }
         } else if (editText.getText().toString().isEmpty()) {

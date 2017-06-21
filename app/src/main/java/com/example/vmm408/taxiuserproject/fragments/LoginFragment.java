@@ -25,6 +25,7 @@ public class LoginFragment extends BaseFragment {
         return new LoginFragment();
     }
 
+    private static final String EDIT_TEXT_LOGIN_KEY = "editTextLoginKey";
     @BindView(R.id.edit_text_login)
     EditText etLogin;
     @BindView(R.id.edit_text_password)
@@ -42,6 +43,15 @@ public class LoginFragment extends BaseFragment {
     @Override
     public void onViewCreated(View view, @Nullable Bundle savedInstanceState) {
         super.onViewCreated(view, savedInstanceState);
+        if (savedInstanceState != null) {
+            etLogin.setText(savedInstanceState.getString(EDIT_TEXT_LOGIN_KEY));
+        }
+    }
+
+    @Override
+    public void onSaveInstanceState(Bundle outState) {
+        outState.putString(EDIT_TEXT_LOGIN_KEY, etLogin.getText().toString());
+        super.onSaveInstanceState(outState);
     }
 
     @OnClick(R.id.text_link_forget_password)
@@ -58,7 +68,7 @@ public class LoginFragment extends BaseFragment {
     public void btnLogin() {
         if (super.validate(etLogin) && super.validate(etPassword)) {
             initProgressDialog();
-            getUserFromBase();
+            findUserInBase();
         }
     }
 
@@ -68,13 +78,13 @@ public class LoginFragment extends BaseFragment {
         progressDialog.show();
     }
 
-    private void getUserFromBase() {
-        mReference = mDatabase.getReference("users");
-        mReference.addValueEventListener(new ValueEventListener() {
+    private void findUserInBase() {
+        (mReference = mDatabase.getReference("users")).addValueEventListener(new ValueEventListener() {
             @Override
             public void onDataChange(DataSnapshot dataSnapshot) {
                 for (DataSnapshot snapshot : dataSnapshot.getChildren()) {
-                    if (UserExistInBase(snapshot)) {
+                    if ((userEmailExistInBase(snapshot) || userPhoneExistInBase(snapshot)) &&
+                            userPasswordExistInBase(snapshot)) {
                         saveUser(snapshot);
                         startActivity(new Intent(getActivity(), MainActivity.class));
                     } else {
@@ -91,18 +101,24 @@ public class LoginFragment extends BaseFragment {
         });
     }
 
-    private boolean UserExistInBase(DataSnapshot dataSnapshot) {
+    private boolean userEmailExistInBase(DataSnapshot dataSnapshot) {
         return etLogin.getText().toString().equals(gson.fromJson(
-                dataSnapshot.getValue().toString(), UserModel.class).getEmailUser()) &&
-                etLogin.getText().toString().equals(gson.fromJson(
-                        dataSnapshot.getValue().toString(), UserModel.class).getPhoneUser()) &&
-                etPassword.getText().toString().equals(gson.fromJson(
-                        dataSnapshot.getValue().toString(), UserModel.class).getPasswordUser());
+                dataSnapshot.getValue().toString(), UserModel.class).getEmailUser());
+    }
+
+    private boolean userPhoneExistInBase(DataSnapshot dataSnapshot) {
+        return etLogin.getText().toString().equals(gson.fromJson(
+                dataSnapshot.getValue().toString(), UserModel.class).getPhoneUser());
+    }
+
+    private boolean userPasswordExistInBase(DataSnapshot dataSnapshot) {
+        return etPassword.getText().toString().equals(gson.fromJson(
+                dataSnapshot.getValue().toString(), UserModel.class).getPasswordUser());
     }
 
     private void saveUser(DataSnapshot dataSnapshot) {
         UserModel.User.setUserModel(gson.fromJson(
                 dataSnapshot.getValue().toString(), UserModel.class));
-        UserModel.User.getUserModel().setIdUser(Integer.parseInt(dataSnapshot.getKey()));
+//        UserModel.User.getUserModel().setIdUser(Integer.parseInt(dataSnapshot.getKey()));
     }
 }

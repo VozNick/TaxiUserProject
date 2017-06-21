@@ -5,11 +5,11 @@ import java.util.List;
 
 public class UserModel {
     private int idUser;
-    private int avatarUser;
+    private String avatarUser;
     private String nameUser;
     private String lastNameUser;
     private String sexUser;
-    private int ageUser;
+    private String ageUser;
     private String phoneUser;
     private String emailUser;
     private String passwordUser;
@@ -28,11 +28,11 @@ public class UserModel {
         return idUser;
     }
 
-    public void setAvatarUser(int avatarUser) {
+    public void setAvatarUser(String avatarUser) {
         this.avatarUser = avatarUser;
     }
 
-    public int getAvatarUser() {
+    public String getAvatarUser() {
         return avatarUser;
     }
 
@@ -60,11 +60,11 @@ public class UserModel {
         return sexUser;
     }
 
-    public void setAgeUser(int ageUser) {
+    public void setAgeUser(String ageUser) {
         this.ageUser = ageUser;
     }
 
-    public int getAgeUser() {
+    public String getAgeUser() {
         return ageUser;
     }
 
@@ -145,5 +145,25 @@ public class UserModel {
         public static UserModel getUserModel() {
             return userModel;
         }
+    }
+
+    @Override
+    public String toString() {
+        return "UserModel{" +
+                "idUser=" + idUser +
+                ", avatarUser=" + avatarUser +
+                ", nameUser='" + nameUser + '\'' +
+                ", lastNameUser='" + lastNameUser + '\'' +
+                ", sexUser='" + sexUser + '\'' +
+                ", ageUser=" + ageUser +
+                ", phoneUser='" + phoneUser + '\'' +
+                ", emailUser='" + emailUser + '\'' +
+                ", passwordUser='" + passwordUser + '\'' +
+                ", experienceDriver=" + experienceDriver +
+                ", carModelDriver='" + carModelDriver + '\'' +
+                ", numPlateCarDriver='" + numPlateCarDriver + '\'' +
+                ", orderModelList=" + orderModelList +
+                ", ratingModelList=" + ratingModelList +
+                '}';
     }
 }

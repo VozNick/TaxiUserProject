@@ -33,6 +33,7 @@ dependencies {
     testCompile 'junit:junit:4.12'
     annotationProcessor 'com.jakewharton:butterknife-compiler:8.6.0'
     compile 'com.google.code.gson:gson:2.2.4'
+    compile 'id.zelory:compressor:2.0.0'
 }
 
 

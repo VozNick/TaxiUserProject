@@ -29,6 +29,13 @@
                 app:civ_border_width="2dp" />
         </FrameLayout>
 
+        <LinearLayout
+            android:id="@+id/new_avatar_container"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:gravity="center_vertical"
+            android:orientation="horizontal" />
+
         <android.support.design.widget.TextInputLayout
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
@@ -65,9 +72,9 @@
 
             <Spinner
                 android:id="@+id/spinner_sex"
-                android:entries="@array/sp_sex"
                 android:layout_width="wrap_content"
-                android:layout_height="wrap_content" />
+                android:layout_height="wrap_content"
+                android:entries="@array/sp_sex" />
 
             <Spinner
                 android:id="@+id/spinner_age"
