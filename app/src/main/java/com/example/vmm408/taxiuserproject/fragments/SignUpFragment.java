@@ -157,12 +157,14 @@ public class SignUpFragment extends BaseFragment {
             @Override
             public void onClick(View v) {
                 // get pic from file
+                startActivityForResult(new Intent(Intent.ACTION_PICK, MediaStore.Images.Media.INTERNAL_CONTENT_URI), 1);
             }
         });
         ButterKnife.findById(getView(), R.id.text_link_delete).setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
                 // delete selected pic
+                imageUserAvatar.setImageResource(R.mipmap.ic_launcher);
             }
         });
     }
@@ -179,14 +181,24 @@ public class SignUpFragment extends BaseFragment {
     @Override
     public void onActivityResult(int requestCode, int resultCode, Intent data) {
         super.onActivityResult(requestCode, resultCode, data);
-        imageUserAvatar.setImageURI(Uri.parse(mCurrentPhotoPath));
+        if (requestCode == 0) {
+            imageUserAvatar.setImageURI(Uri.parse(mCurrentPhotoPath));
+        } else if (requestCode == 1) {
+            try {
+                imageUserAvatar.setImageBitmap(MediaStore.Images.Media.getBitmap(this.getActivity().getContentResolver(), data.getData()));
+                mCurrentPhotoPath = String.valueOf(data.getData());
+            } catch (IOException e) {
+                e.printStackTrace();
+            }
+        }
+
         newAvatarContainer.removeAllViews();
     }
 
     private String fromFileToString() {
         ByteArrayOutputStream byteArrayOutputStream = new ByteArrayOutputStream();
         new Compressor(getContext()).compressToBitmap(new File(mCurrentPhotoPath))
-                .compress(Bitmap.CompressFormat.JPEG, 100, byteArrayOutputStream);
+                .compress(Bitmap.CompressFormat.PNG, 80, byteArrayOutputStream);
         return Base64.encodeToString(byteArrayOutputStream.toByteArray(), Base64.DEFAULT);
 //        //from string to file
 //        imageBytes = Base64.decode(imageString, Base64.DEFAULT);
