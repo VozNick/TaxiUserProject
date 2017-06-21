@@ -8,9 +8,6 @@ import android.widget.LinearLayout;
 import com.example.vmm408.taxiuserproject.fragments.LoginFragment;
 import com.example.vmm408.taxiuserproject.fragments.SignUpFragment;
 
-import java.io.Serializable;
-import java.util.List;
-
 import butterknife.BindView;
 import butterknife.ButterKnife;
 

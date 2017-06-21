@@ -135,9 +135,6 @@ public class UserModel {
     public static class User {
         private static UserModel userModel = new UserModel();
 
-        public User() {
-        }
-
         public static void setUserModel(UserModel userModel) {
             User.userModel = userModel;
         }

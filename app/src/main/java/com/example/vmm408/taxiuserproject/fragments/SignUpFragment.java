@@ -140,17 +140,19 @@ public class SignUpFragment extends BaseFragment {
                     @Override
                     public void onClick(View v) {
                         // get pic from camera
-                        try {
-                            startActivityForResult(new Intent(
-                                    MediaStore.ACTION_IMAGE_CAPTURE).putExtra(
-                                    MediaStore.EXTRA_OUTPUT,
-                                    FileProvider.getUriForFile(
-                                            getActivity(),
-                                            "com.example.vmm408.taxiuserproject",
-                                            createImageFile())), 0);
-                        } catch (IOException ex) {
-                            ex.printStackTrace();
-                        }
+//                        try {
+//                            startActivityForResult(new Intent(
+//                                    MediaStore.ACTION_IMAGE_CAPTURE).putExtra(
+//                                    MediaStore.EXTRA_OUTPUT,
+//                                    FileProvider.getUriForFile(
+//                                            getActivity(),
+//                                            "com.example.vmm408.taxiuserproject",
+//                                            createImageFile())), 0);
+//                        } catch (IOException ex) {
+//                            ex.printStackTrace();
+//                        }
+
+                        startActivityForResult(new Intent(MediaStore.ACTION_IMAGE_CAPTURE), 0);
                     }
                 });
         ButterKnife.findById(getView(), R.id.text_link_file).setOnClickListener(new View.OnClickListener() {
@@ -182,7 +184,8 @@ public class SignUpFragment extends BaseFragment {
     public void onActivityResult(int requestCode, int resultCode, Intent data) {
         super.onActivityResult(requestCode, resultCode, data);
         if (requestCode == 0) {
-            imageUserAvatar.setImageURI(Uri.parse(mCurrentPhotoPath));
+            imageUserAvatar.setImageBitmap((Bitmap) data.getExtras().get("data"));
+//            imageUserAvatar.setImageURI(Uri.parse(mCurrentPhotoPath));
         } else if (requestCode == 1) {
             try {
                 imageUserAvatar.setImageBitmap(MediaStore.Images.Media.getBitmap(this.getActivity().getContentResolver(), data.getData()));
