@@ -39,61 +39,75 @@ public class BaseFragment extends Fragment {
     }
 
     protected boolean validate(EditText editText) {
-        if (editText.getId() == R.id.edit_text_login) {
-            String login = editText.getText().toString();
-            if (login.isEmpty() ||
-                    (!Patterns.EMAIL_ADDRESS.matcher(login).matches() &&
-                            !Patterns.PHONE.matcher(login).matches())) {
-                editText.setError("wrong email or phone");
-                return false;
-            }
-        } else if (editText.getId() == R.id.edit_text_email) {
-            String email = editText.getText().toString();
-            if (email.isEmpty() ||
-                    (!Patterns.EMAIL_ADDRESS.matcher(email).matches())) {
-                editText.setError("wrong email format");
-                return false;
-            }
-        } else if (editText.getId() == R.id.edit_text_phone) {
-            String phone = editText.getText().toString();
-            if (phone.isEmpty() ||
-                    (!Patterns.PHONE.matcher(phone).matches())) {
-                editText.setError("wrong phone format");
-                return false;
-            }
-        } else if (editText.getId() == R.id.edit_text_password) {
-            String password = editText.getText().toString();
-            if (!isValidPassword(password)) {
-                editText.setError("password must be between 6 and 15 chars. " +
-                        "Must contain numbers, chars and at least one capital letter");
-                return false;
-            }
-        } else if (editText.getText().toString().isEmpty()) {
-            editText.setError("can't be empty fields");
-            return false;
+        String errorMessage = findError(editText);
+        if (errorMessage == null) {
+            return true;
         }
-        return true;
-    }
-
-    private boolean isValidPassword(String password) {
-        if (Pattern.compile("([A-Za-z0-9]){6,15}").matcher(password).matches()) {
-            if (Pattern.compile("([A-Z])+").matcher(password).find()
-                    && Pattern.compile("([0-9])+").matcher(password).find()) {
-                return true;
-            }
-        }
+        editText.setError(errorMessage);
         return false;
     }
 
+    private String findError(EditText editText) {
+        String data = editText.getText().toString();
+        if (data.isEmpty()) return "can't be empty fields";
+        if (editText.getId() == R.id.edit_text_login &&
+                !Patterns.EMAIL_ADDRESS.matcher(data).matches() &&
+                !Patterns.PHONE.matcher(data).matches()) return "wrong email or phone";
+        if (editText.getId() == R.id.edit_text_email &&
+                !Patterns.EMAIL_ADDRESS.matcher(data).matches()) return "wrong email format";
+        if (editText.getId() == R.id.edit_text_phone &&
+                !Patterns.PHONE.matcher(data).matches()) return "wrong phone format";
+        if (editText.getId() == R.id.edit_text_password &&
+                !Pattern.compile("([A-Za-z0-9]){6,15}").matcher(data).matches() &&
+                !Pattern.compile("([A-Z])+").matcher(data).find() &&
+                !Pattern.compile("([0-9])+").matcher(data).find())
+            return "password must be between 6 and 15 chars. " +
+                    "Must contain numbers, chars and at least one capital letter";
+        return null;
+    }
+
     protected boolean validate(int position) {
-        if (position == 0) {
-            makeToast("fill in spinners");
-            return false;
+        if (position != 0) {
+            return true;
         }
-        return true;
+        makeToast("fill in spinners");
+        return false;
     }
 
     protected void makeToast(String string) {
         Toast.makeText(getActivity(), string, Toast.LENGTH_SHORT).show();
     }
+
+//    protected boolean validate(EditText editText) {
+//        String data = editText.getText().toString();
+//        if (data.isEmpty()) {
+//            editText.setError("can't be empty fields");
+//            return false;
+//        }
+//        if (editText.getId() == R.id.edit_text_login &&
+//                !Patterns.EMAIL_ADDRESS.matcher(data).matches() &&
+//                !Patterns.PHONE.matcher(data).matches()) {
+//            editText.setError("wrong email or phone");
+//            return false;
+//        }
+//        if (editText.getId() == R.id.edit_text_email &&
+//                !Patterns.EMAIL_ADDRESS.matcher(data).matches()) {
+//            editText.setError("wrong email format");
+//            return false;
+//        }
+//        if (editText.getId() == R.id.edit_text_phone &&
+//                !Patterns.PHONE.matcher(data).matches()) {
+//            editText.setError("wrong phone format");
+//            return false;
+//        }
+//        if (editText.getId() == R.id.edit_text_password &&
+//                !Pattern.compile("([A-Za-z0-9]){6,15}").matcher(data).matches() &&
+//                !Pattern.compile("([A-Z])+").matcher(data).find() &&
+//                !Pattern.compile("([0-9])+").matcher(data).find()) {
+//            editText.setError("password must be between 6 and 15 chars. " +
+//                    "Must contain numbers, chars and at least one capital letter");
+//            return false;
+//        }
+//        return true;
+//    }
 }

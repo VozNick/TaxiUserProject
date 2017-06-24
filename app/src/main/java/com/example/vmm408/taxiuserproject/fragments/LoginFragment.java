@@ -20,7 +20,7 @@ import com.google.firebase.database.ValueEventListener;
 import butterknife.BindView;
 import butterknife.OnClick;
 
-public class LoginFragment extends BaseFragment {
+public class LoginFragment extends BaseFragment implements ValueEventListener {
     public static LoginFragment newInstance() {
         return new LoginFragment();
     }
@@ -30,7 +30,7 @@ public class LoginFragment extends BaseFragment {
     EditText etLogin;
     @BindView(R.id.edit_text_password)
     EditText etPassword;
-    private ProgressDialog progressDialog;
+    private ProgressDialog mProgressDialog;
 
     @Nullable
     @Override
@@ -43,9 +43,8 @@ public class LoginFragment extends BaseFragment {
     @Override
     public void onViewCreated(View view, @Nullable Bundle savedInstanceState) {
         super.onViewCreated(view, savedInstanceState);
-        if (savedInstanceState != null) {
+        if (savedInstanceState != null)
             etLogin.setText(savedInstanceState.getString(EDIT_TEXT_LOGIN_KEY));
-        }
     }
 
     @Override
@@ -56,7 +55,6 @@ public class LoginFragment extends BaseFragment {
 
     @OnClick(R.id.text_link_forget_password)
     public void tvLinkForgetPassword() {
-        // write code here
     }
 
     @OnClick(R.id.text_link_sign_up)
@@ -67,58 +65,47 @@ public class LoginFragment extends BaseFragment {
     @OnClick(R.id.btn_login)
     public void btnLogin() {
         if (super.validate(etLogin) && super.validate(etPassword)) {
-            initProgressDialog();
-            findUserInBase();
+        initProgressDialog().show();
+        (mReference = mDatabase.getReference("users")).addValueEventListener(this);
         }
     }
 
-    private void initProgressDialog() {
-        progressDialog = new ProgressDialog(getActivity());
-        progressDialog.setMessage("Authenticating...");
-        progressDialog.show();
+    private ProgressDialog initProgressDialog() {
+        (mProgressDialog = new ProgressDialog(getActivity())).setMessage("Authenticating...");
+        return mProgressDialog;
     }
 
-    private void findUserInBase() {
-        (mReference = mDatabase.getReference("users")).addValueEventListener(new ValueEventListener() {
-            @Override
-            public void onDataChange(DataSnapshot dataSnapshot) {
-                for (DataSnapshot snapshot : dataSnapshot.getChildren()) {
-                    if ((userEmailExistInBase(snapshot) || userPhoneExistInBase(snapshot)) &&
-                            userPasswordExistInBase(snapshot)) {
-                        saveUser(snapshot);
-                        startActivity(new Intent(getActivity(), MainActivity.class));
-                    } else {
-                        makeToast("invalid email / password");
-                    }
-                    progressDialog.dismiss();
-                }
+    @Override
+    public void onDataChange(DataSnapshot dataSnapshot) {
+        for (DataSnapshot snapshot : dataSnapshot.getChildren())
+            if (findUserInBase(snapshot)) {
+                loginUser(snapshot);
+                mReference.onDisconnect();
+                return;
             }
-
-            @Override
-            public void onCancelled(DatabaseError databaseError) {
-                progressDialog.dismiss();
-            }
-        });
+        mProgressDialog.dismiss();
+        makeToast("invalid email / password");
     }
 
-    private boolean userEmailExistInBase(DataSnapshot dataSnapshot) {
-        return etLogin.getText().toString().equals(gson.fromJson(
-                dataSnapshot.getValue().toString(), UserModel.class).getEmailUser());
+    @Override
+    public void onCancelled(DatabaseError databaseError) {
+        mProgressDialog.dismiss();
     }
 
-    private boolean userPhoneExistInBase(DataSnapshot dataSnapshot) {
-        return etLogin.getText().toString().equals(gson.fromJson(
-                dataSnapshot.getValue().toString(), UserModel.class).getPhoneUser());
+    private void loginUser(DataSnapshot dataSnapshot) {
+        UserModel.User.setUserModel(gson.fromJson(dataSnapshot.getValue().toString(), UserModel.class));
+        UserModel.User.getUserModel().setIdUser(Integer.parseInt(dataSnapshot.getKey()));
+        mProgressDialog.dismiss();
+        startActivity(new Intent(getActivity(), MainActivity.class));
     }
 
-    private boolean userPasswordExistInBase(DataSnapshot dataSnapshot) {
-        return etPassword.getText().toString().equals(gson.fromJson(
-                dataSnapshot.getValue().toString(), UserModel.class).getPasswordUser());
+    private boolean findUserInBase(DataSnapshot dataSnapshot) {
+        return (etLogin.getText().toString().equals(userGsonFromBase(dataSnapshot).getEmailUser()) ||
+                etLogin.getText().toString().equals(userGsonFromBase(dataSnapshot).getPhoneUser())) &&
+                etPassword.getText().toString().equals(userGsonFromBase(dataSnapshot).getPasswordUser());
     }
 
-    private void saveUser(DataSnapshot dataSnapshot) {
-        UserModel.User.setUserModel(gson.fromJson(
-                dataSnapshot.getValue().toString(), UserModel.class));
-//        UserModel.User.getUserModel().setIdUser(Integer.parseInt(dataSnapshot.getKey()));
+    private UserModel userGsonFromBase(DataSnapshot dataSnapshot) {
+        return gson.fromJson(dataSnapshot.getValue().toString(), UserModel.class);
     }
 }
