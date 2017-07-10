@@ -5,36 +5,33 @@ import android.support.v7.app.AppCompatActivity;
 import android.os.Bundle;
 import android.widget.LinearLayout;
 
-import com.example.vmm408.taxiuserproject.fragments.LoginFragment;
-import com.example.vmm408.taxiuserproject.fragments.SignUpFragment;
+import com.example.vmm408.taxiuserproject.fragments.SignInFragment;
 
 import butterknife.BindView;
 import butterknife.ButterKnife;
 
 public class AuthenticationActivity extends AppCompatActivity {
+
+
     @BindView(R.id.activity_authentication_container)
     LinearLayout activityAuthContainer;
-    private Fragment mFragment;
+    private Fragment fragment;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_authentication);
         ButterKnife.bind(this);
-        changeFragment(LoginFragment.newInstance());
+        changeFragment(SignInFragment.newInstance());
     }
 
     @Override
     public void onBackPressed() {
-        if (mFragment instanceof SignUpFragment) {
-            changeFragment(LoginFragment.newInstance());
-        } else {
-            super.onBackPressed();
-        }
+        super.onBackPressed();
     }
 
     public void changeFragment(Fragment fragment) {
-        this.mFragment = fragment;
+        this.fragment = fragment;
         getSupportFragmentManager().beginTransaction()
                 .replace(activityAuthContainer.getId(), fragment).commit();
     }

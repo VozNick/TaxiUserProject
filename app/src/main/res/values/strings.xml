@@ -1,116 +1,76 @@
 <resources>
     <string name="app_name">TaxiUserProject</string>
-    <string name="hint_login">Email or phone</string>
-    <string name="hint_password">Password</string>
-    <string name="btn_text_login">Login</string>
-    <string name="tv_link_sign_up">No account yet? Create one</string>
-    <string name="tv_link_forget_password">forget password</string>
-    <string name="hint_name">Name</string>
-    <string name="hint_last_name">Last Name</string>
+
+
+    // fragment_save_data
+    <string name="hint_full_name">Full Name</string>
     <string name="hint_phone">Phone</string>
-    <string name="hint_email">Email</string>
-    <string name="hint_conf_password">Confirm Password</string>
-    <string name="btn_create_account">Create Account</string>
-    <string name="tv_link_login">Already a member? Login</string>
-    <string name="tv_link_photo_from_camera">camera</string>
-    <string name="tv_link_photo_from_file">file</string>
-    <string name="tv_link_photo_delete">delete</string>
-
-    <item name="visible" type="id" />
-    <item name="masked" type="id" />
-
-    <array name="sp_sex">
-        <item>sex</item>
+    <array name="gender">
         <item>male</item>
         <item>female</item>
     </array>
+    <string name="hint_birthday">BirthDay</string>
+    <string name="btn_save">Save</string>
+    <string name="btn_cancel">Cancel</string>
 
-    <!--<array name="sp_age">-->
-        <!--<item>age</item>-->
-        <!--<item>16</item>-->
-        <!--<item>17</item>-->
-        <!--<item>18</item>-->
-        <!--<item>19</item>-->
-        <!--<item>20</item>-->
-        <!--<item>21</item>-->
-        <!--<item>22</item>-->
-        <!--<item>23</item>-->
-        <!--<item>24</item>-->
-        <!--<item>25</item>-->
-        <!--<item>26</item>-->
-        <!--<item>27</item>-->
-        <!--<item>28</item>-->
-        <!--<item>29</item>-->
-        <!--<item>30</item>-->
-        <!--<item>31</item>-->
-        <!--<item>32</item>-->
-        <!--<item>33</item>-->
-        <!--<item>34</item>-->
-        <!--<item>35</item>-->
-        <!--<item>36</item>-->
-        <!--<item>37</item>-->
-        <!--<item>38</item>-->
-        <!--<item>39</item>-->
-        <!--<item>40</item>-->
-        <!--<item>41</item>-->
-        <!--<item>42</item>-->
-        <!--<item>43</item>-->
-        <!--<item>44</item>-->
-        <!--<item>45</item>-->
-        <!--<item>46</item>-->
-        <!--<item>47</item>-->
-        <!--<item>48</item>-->
-        <!--<item>49</item>-->
-        <!--<item>50</item>-->
-        <!--<item>51</item>-->
-        <!--<item>52</item>-->
-        <!--<item>53</item>-->
-        <!--<item>54</item>-->
-        <!--<item>55</item>-->
-        <!--<item>56</item>-->
-        <!--<item>57</item>-->
-        <!--<item>58</item>-->
-        <!--<item>59</item>-->
-        <!--<item>60</item>-->
-        <!--<item>61</item>-->
-        <!--<item>62</item>-->
-        <!--<item>63</item>-->
-        <!--<item>64</item>-->
-        <!--<item>65</item>-->
-        <!--<item>66</item>-->
-        <!--<item>67</item>-->
-        <!--<item>68</item>-->
-        <!--<item>69</item>-->
-        <!--<item>70</item>-->
-        <!--<item>71</item>-->
-        <!--<item>72</item>-->
-        <!--<item>73</item>-->
-        <!--<item>74</item>-->
-        <!--<item>75</item>-->
-        <!--<item>76</item>-->
-        <!--<item>77</item>-->
-        <!--<item>78</item>-->
-        <!--<item>79</item>-->
-        <!--<item>80</item>-->
-        <!--<item>81</item>-->
-        <!--<item>82</item>-->
-        <!--<item>83</item>-->
-        <!--<item>84</item>-->
-        <!--<item>85</item>-->
-        <!--<item>86</item>-->
-        <!--<item>87</item>-->
-        <!--<item>88</item>-->
-        <!--<item>89</item>-->
-        <!--<item>90</item>-->
-        <!--<item>91</item>-->
-        <!--<item>92</item>-->
-        <!--<item>93</item>-->
-        <!--<item>94</item>-->
-        <!--<item>95</item>-->
-        <!--<item>96</item>-->
-        <!--<item>97</item>-->
-        <!--<item>98</item>-->
-        <!--<item>99</item>-->
-    <!--</array>-->
+
+    // item_menu_new_avatar
+    <array name="menu_new_avatar">
+        <item>Camera</item>
+        <item>File</item>
+        <item>Delete</item>
+    </array>
+
+
+    // fragment_create_order
+    <string name="hint_edit_text_order_from">From</string>
+    <string name="hint_edit_text_order_destination">Destination</string>
+    <string name="hint_edit_text_order_price">Price</string>
+    <string name="hint_edit_text_order_comment">Comment</string>
+    <string name="btn_create_order">Create Order</string>
+
+
+    // item_menu_profile
+    <array name="menu_profile">
+        <item>Profile</item>
+        <item>Rating</item>
+        <item>Orders history</item>
+        <item>Settings</item>
+    </array>
+
+
+    // item_current_order
+    <string name="item_text_from">From</string>
+    <string name="item_text_destination">Destination</string>
+    <string name="item_text_price">Price</string>
+    <string name="item_text_comment">Comment</string>
+    <string name="tv_link_edit_order">Edit</string>
+    <string name="tv_link_delete_order">Delete</string>
+    <string name="text_status_order">Not Accepted</string>
+
+
+    // fragment_orders_history
+    <string name="text_current_order">Current order</string>
+    <string name="text_history_order">History Orders</string>
+
+
+    // fragment_settings
+    <string name="text_language_settings">Language</string>
+    <string name="text_theme_settings">Theme</string>
+    <string name="btn_text_sign_out">Sign out</string>
+
+
+    <array name="sp_language">
+        <item>english</item>
+        <item>українська</item>
+    </array>
+
+    <array name="sp_theme">
+        <item>light</item>
+        <item>dark</item>
+    </array>
+
+    <item name="visible" type="id" />
+    <item name="masked" type="id" />
 
 </resources>

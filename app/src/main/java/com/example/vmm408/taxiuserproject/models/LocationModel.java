@@ -1,15 +1,15 @@
 package com.example.vmm408.taxiuserproject.models;
 
 public class LocationModel {
-    private int idUserLocation;
+    private String idUserLocation;
     private double latitudeLocation;
     private double longitudeLocation;
 
-    public void setIdUserLocation(int idUserLocation) {
+    public void setIdUserLocation(String idUserLocation) {
         this.idUserLocation = idUserLocation;
     }
 
-    public int getIdUserLocation() {
+    public String getIdUserLocation() {
         return idUserLocation;
     }
 

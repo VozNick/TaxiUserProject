@@ -3,10 +3,9 @@ package com.example.vmm408.taxiuserproject.models;
 import java.util.Date;
 
 public class OrderModel {
-    private int idUserOrder;
+    private String idUserOrder;
     private String fromOrder;
     private String destinationOrder;
-    private Date dateOrder;
     private double priceOrder;
     private String commentOrder;
 
@@ -14,11 +13,11 @@ public class OrderModel {
     private LocationModel locationModel;
     private OrderStatusModel orderStatusModel;
 
-    public void setIdUserOrder(int idUserOrder) {
+    public void setIdUserOrder(String idUserOrder) {
         this.idUserOrder = idUserOrder;
     }
 
-    public int getIdUserOrder() {
+    public String getIdUserOrder() {
         return idUserOrder;
     }
 
@@ -36,14 +35,6 @@ public class OrderModel {
 
     public String getDestinationOrder() {
         return destinationOrder;
-    }
-
-    public void setDateOrder(Date dateOrder) {
-        this.dateOrder = dateOrder;
-    }
-
-    public Date getDateOrder() {
-        return dateOrder;
     }
 
     public void setPriceOrder(double priceOrder) {
@@ -84,5 +75,17 @@ public class OrderModel {
 
     public OrderStatusModel getOrderStatusModel() {
         return orderStatusModel;
+    }
+
+    public static class Order {
+        private static OrderModel orderModel = new OrderModel();
+
+        public static void setOrderModel(OrderModel orderModel) {
+            Order.orderModel = orderModel;
+        }
+
+        public static OrderModel getOrderModel() {
+            return orderModel;
+        }
     }
 }

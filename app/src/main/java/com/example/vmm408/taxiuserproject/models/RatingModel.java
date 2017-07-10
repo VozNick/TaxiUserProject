@@ -1,15 +1,17 @@
 package com.example.vmm408.taxiuserproject.models;
 
 public class RatingModel {
-    private int idUserRating;
+    private String idUserRating;
     private String commentsRating;
     private int starsRating;
 
-    public void setIdUserRating(int idUserRating) {
+    private UserModel userModel;
+
+    public void setIdUserRating(String idUserRating) {
         this.idUserRating = idUserRating;
     }
 
-    public int getIdUserRating() {
+    public String getIdUserRating() {
         return idUserRating;
     }
 
@@ -27,5 +29,15 @@ public class RatingModel {
 
     public int getStarsRating() {
         return starsRating;
+    }
+
+    @Override
+    public String toString() {
+        return "RatingModel{" +
+                "idUserRating='" + idUserRating + '\'' +
+                ", commentsRating='" + commentsRating + '\'' +
+                ", starsRating=" + starsRating +
+                ", userModel=" + userModel +
+                '}';
     }
 }

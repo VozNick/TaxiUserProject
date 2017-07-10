@@ -4,15 +4,13 @@ import java.util.ArrayList;
 import java.util.List;
 
 public class UserModel {
-    private int idUser;
+    private String idUser;
     private String avatarUser;
-    private String nameUser;
-    private String lastNameUser;
-    private String sexUser;
+    private String fullNameUser;
+    private String genderUser;
     private String ageUser;
     private String phoneUser;
-    private String emailUser;
-    private String passwordUser;
+
     private double experienceDriver;
     private String carModelDriver;
     private String numPlateCarDriver;
@@ -20,11 +18,11 @@ public class UserModel {
     private List<OrderModel> orderModelList = new ArrayList<>();
     private List<RatingModel> ratingModelList = new ArrayList<>();
 
-    public void setIdUser(int idUser) {
+    public void setIdUser(String idUser) {
         this.idUser = idUser;
     }
 
-    public int getIdUser() {
+    public String getIdUser() {
         return idUser;
     }
 
@@ -36,28 +34,20 @@ public class UserModel {
         return avatarUser;
     }
 
-    public void setNameUser(String nameUser) {
-        this.nameUser = nameUser;
+    public void setFullNameUser(String fullNameUser) {
+        this.fullNameUser = fullNameUser;
     }
 
-    public String getNameUser() {
-        return nameUser;
+    public String getFullNameUser() {
+        return fullNameUser;
     }
 
-    public void setLastNameUser(String lastNameUser) {
-        this.lastNameUser = lastNameUser;
+    public void setGenderUser(String genderUser) {
+        this.genderUser = genderUser;
     }
 
-    public String getLastNameUser() {
-        return lastNameUser;
-    }
-
-    public void setSexUser(String sexUser) {
-        this.sexUser = sexUser;
-    }
-
-    public String isSexUser() {
-        return sexUser;
+    public String getGenderUser() {
+        return genderUser;
     }
 
     public void setAgeUser(String ageUser) {
@@ -74,22 +64,6 @@ public class UserModel {
 
     public String getPhoneUser() {
         return phoneUser;
-    }
-
-    public void setEmailUser(String emailUser) {
-        this.emailUser = emailUser;
-    }
-
-    public String getEmailUser() {
-        return emailUser;
-    }
-
-    public void setPasswordUser(String passwordUser) {
-        this.passwordUser = passwordUser;
-    }
-
-    public String getPasswordUser() {
-        return passwordUser;
     }
 
     public void setExperienceDriver(double experienceDriver) {
@@ -149,13 +123,10 @@ public class UserModel {
         return "UserModel{" +
                 "idUser=" + idUser +
                 ", avatarUser=" + avatarUser +
-                ", nameUser='" + nameUser + '\'' +
-                ", lastNameUser='" + lastNameUser + '\'' +
-                ", sexUser='" + sexUser + '\'' +
+                ", fullNameUser='" + fullNameUser + '\'' +
+                ", genderUser='" + genderUser + '\'' +
                 ", ageUser=" + ageUser +
                 ", phoneUser='" + phoneUser + '\'' +
-                ", emailUser='" + emailUser + '\'' +
-                ", passwordUser='" + passwordUser + '\'' +
                 ", experienceDriver=" + experienceDriver +
                 ", carModelDriver='" + carModelDriver + '\'' +
                 ", numPlateCarDriver='" + numPlateCarDriver + '\'' +
