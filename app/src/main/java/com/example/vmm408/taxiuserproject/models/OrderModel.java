@@ -6,12 +6,10 @@ public class OrderModel {
     private String idUserOrder;
     private String fromOrder;
     private String destinationOrder;
-    private double priceOrder;
+    private int priceOrder;
     private String commentOrder;
-
-    private UserModel userModel;
-    private LocationModel locationModel;
-    private OrderStatusModel orderStatusModel;
+    private Date timeOrder;
+    private boolean orderAccepted;
 
     public void setIdUserOrder(String idUserOrder) {
         this.idUserOrder = idUserOrder;
@@ -37,11 +35,11 @@ public class OrderModel {
         return destinationOrder;
     }
 
-    public void setPriceOrder(double priceOrder) {
+    public void setPriceOrder(int priceOrder) {
         this.priceOrder = priceOrder;
     }
 
-    public double getPriceOrder() {
+    public int getPriceOrder() {
         return priceOrder;
     }
 
@@ -53,28 +51,20 @@ public class OrderModel {
         return commentOrder;
     }
 
-    public void setUserModel(UserModel userModel) {
-        this.userModel = userModel;
+    public void setTimeOrder(Date timeOrder) {
+        this.timeOrder = timeOrder;
     }
 
-    public UserModel getUserModel() {
-        return userModel;
+    public Date getTimeOrder() {
+        return timeOrder;
     }
 
-    public void setLocationModel(LocationModel locationModel) {
-        this.locationModel = locationModel;
+    public void setOrderAccepted(boolean orderAccepted) {
+        this.orderAccepted = orderAccepted;
     }
 
-    public LocationModel getLocationModel() {
-        return locationModel;
-    }
-
-    public void setOrderStatusModel(OrderStatusModel orderStatusModel) {
-        this.orderStatusModel = orderStatusModel;
-    }
-
-    public OrderStatusModel getOrderStatusModel() {
-        return orderStatusModel;
+    public boolean isOrderAccepted() {
+        return orderAccepted;
     }
 
     public static class Order {

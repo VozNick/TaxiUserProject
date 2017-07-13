@@ -50,9 +50,7 @@ public class SignInFragment extends BaseFragment
     @Override
     public void onViewCreated(View view, @Nullable Bundle savedInstanceState) {
         super.onViewCreated(view, savedInstanceState);
-        googleApiClient = initUserSingIn();
-//        googleApiClient.disconnect();
-//        googleApiClient.clearDefaultAccountAndReconnect();
+        super.googleApiClient = initUserSingIn();
     }
 
     private GoogleApiClient initUserSingIn() {

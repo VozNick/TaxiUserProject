@@ -53,22 +53,22 @@ public class CreateOrderFragment extends BaseFragment {
                 super.validate(etOrderDestination) &&
                 super.validate(etOrderPrice)) {
 
-//            OrderModel.Order.getOrderModel().setIdUserOrder(UserModel.User.getUserModel().getIdUser());
-//
-//            OrderModel.Order.getOrderModel().setFromOrder(etOrderFrom.getText().toString());
-//            OrderModel.Order.getOrderModel().setDestinationOrder(etOrderDestination.getText().toString());
-//            OrderModel.Order.getOrderModel().setPriceOrder(Double.parseDouble(etOrderPrice.getText().toString()));
-//            OrderModel.Order.getOrderModel().setCommentOrder(etOrderComment.getText().toString());
-//
-//            OrderModel.Order.getOrderModel().getOrderStatusModel()
-//                    .setIdUserOrderStatus(UserModel.User.getUserModel().getIdUser());
-//            OrderModel.Order.getOrderModel().getOrderStatusModel().setOrderAcceptedStatus(false);
-//
-//            (mReference = mDatabase.getReference("orders"))
-//                    .child((UserModel.User.getUserModel().getIdUser()))
-//                    .setValue(OrderModel.Order.getOrderModel());
-//
-//            ((MainActivity) getActivity()).changeFragment(MapFragment.newInstance());
+            OrderModel.Order.getOrderModel().setIdUserOrder(UserModel.User.getUserModel().getIdUser());
+            OrderModel.Order.getOrderModel().setFromOrder(etOrderFrom.getText().toString());
+            OrderModel.Order.getOrderModel().setDestinationOrder(etOrderDestination.getText().toString());
+            OrderModel.Order.getOrderModel().setPriceOrder(Integer.parseInt(etOrderPrice.getText().toString()));
+            OrderModel.Order.getOrderModel().setCommentOrder(etOrderComment.getText().toString());
+//            OrderModel.Order.getOrderModel().setTimeOrder();
+            OrderModel.Order.getOrderModel().setOrderAccepted(false);
+
+            String currentOrderKey = (mReference = mDatabase.getReference("orders")).push().getKey();
+            UserModel.User.getUserModel().setIdCurrentOrder(currentOrderKey);
+            mReference.child(currentOrderKey).setValue(OrderModel.Order.getOrderModel());
+            (mReference = mDatabase.getReference("users"))
+                    .child(UserModel.User.getUserModel().getIdUser())
+                    .child("idCurrentOrder")
+                    .setValue(currentOrderKey);
+            ((MainActivity) getActivity()).changeFragment(MapFragment.newInstance());
         }
     }
 }

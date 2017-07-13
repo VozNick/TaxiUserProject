@@ -1,8 +1,8 @@
 package com.example.vmm408.taxiuserproject.fragments;
 
 import android.Manifest;
-import android.content.Intent;
 import android.content.pm.PackageManager;
+import android.graphics.BitmapFactory;
 import android.location.Address;
 import android.location.Geocoder;
 import android.location.Location;
@@ -15,26 +15,24 @@ import android.support.v4.app.ActivityCompat;
 import android.support.v4.app.Fragment;
 import android.support.v7.app.AlertDialog;
 import android.support.v7.widget.SearchView;
+import android.util.Base64;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
-import android.widget.AdapterView;
 import android.widget.ImageView;
+import android.widget.TextView;
 import android.widget.Toast;
 
-import com.example.vmm408.taxiuserproject.AuthenticationActivity;
+import com.bumptech.glide.Glide;
 import com.example.vmm408.taxiuserproject.MainActivity;
 import com.example.vmm408.taxiuserproject.R;
 import com.example.vmm408.taxiuserproject.models.OrderModel;
-import com.example.vmm408.taxiuserproject.models.OrderStatusModel;
 import com.example.vmm408.taxiuserproject.models.UserModel;
 import com.google.android.gms.maps.CameraUpdateFactory;
 import com.google.android.gms.maps.GoogleMap;
-import com.google.android.gms.maps.OnMapReadyCallback;
 import com.google.android.gms.maps.SupportMapFragment;
 import com.google.android.gms.maps.model.CameraPosition;
 import com.google.android.gms.maps.model.LatLng;
-import com.google.android.gms.maps.model.Marker;
 import com.google.android.gms.maps.model.MarkerOptions;
 import com.google.firebase.database.DataSnapshot;
 import com.google.firebase.database.DatabaseError;
@@ -47,6 +45,7 @@ import java.util.Locale;
 import butterknife.BindView;
 import butterknife.ButterKnife;
 import butterknife.OnClick;
+import de.hdodenhof.circleimageview.CircleImageView;
 
 import static android.content.Context.LOCATION_SERVICE;
 
@@ -59,12 +58,21 @@ public class MapFragment extends BaseFragment {
     SearchView searchViewAppBar;
     @BindView(R.id.im_btn_clear_search)
     ImageView imBtnClearSearch;
+    @BindView(R.id.im_btn_profile)
+    CircleImageView imBtnProfile;
     private LocationManager mLocationManager;
     private Location mLocation;
     private GoogleMap mMap;
+    private SearchView.SearchAutoComplete searchAutoComplete;
     private ValueEventListener findUserInBase = new ValueEventListener() {
         @Override
         public void onDataChange(DataSnapshot dataSnapshot) {
+            try {
+                UserModel.User.getUserModel()
+                        .setAvatarUser(dataSnapshot.child("avatarUser").getValue().toString());
+            } catch (Exception e) {
+                e.printStackTrace();
+            }
             UserModel.User.getUserModel()
                     .setIdUser(dataSnapshot.child("idUser").getValue().toString());
             UserModel.User.getUserModel()
@@ -93,6 +101,8 @@ public class MapFragment extends BaseFragment {
             imBtnClearSearch.setVisibility(newText.length() > 0 ? View.VISIBLE : View.GONE);
             if (newText.length() > 2) {
             }
+//            searchAutoComplete.setAdapter(new ArrayAdapter<>(getActivity(), android.R.layout.simple_list_item_1, temp));
+//            searchAutoComplete.showDropDown();
             return false;
         }
     };
@@ -133,6 +143,8 @@ public class MapFragment extends BaseFragment {
             (mReference = mDatabase.getReference("users")).child(super.userSigned())
                     .addListenerForSingleValueEvent(findUserInBase);
         initSearchView();
+        initAutoComplete();
+        initAvatar();
         findLocation();
         initMapFragment();
     }
@@ -141,6 +153,28 @@ public class MapFragment extends BaseFragment {
         searchViewAppBar.setIconified(false);
         searchViewAppBar.setQueryHint("Search here...");
         searchViewAppBar.setOnQueryTextListener(mTextListener);
+    }
+
+    private void initAutoComplete() {
+//        searchAutoComplete = (SearchView.SearchAutoComplete) searchViewAppBar.findViewById(R.id.search_src_text);
+//        searchAutoComplete.setOnItemClickListener((parent, view, position, id) -> searchViewAppBar
+//                .setQuery(userModels.get(position).getName(), true));
+    }
+
+    private void initAvatar() {
+        String avatar = UserModel.User.getUserModel().getAvatarUser();
+        if (avatar == null) {
+            imBtnProfile.setImageResource(R.mipmap.ic_launcher);
+        } else if (avatar.startsWith("https://lh3.googleusercontent.com/")) {
+            downloadPhotoUri(avatar);
+        } else {
+            byte[] imageBytes = Base64.decode(UserModel.User.getUserModel().getAvatarUser(), Base64.DEFAULT);
+            imBtnProfile.setImageBitmap(BitmapFactory.decodeByteArray(imageBytes, 0, imageBytes.length));
+        }
+    }
+
+    private void downloadPhotoUri(String uri) {
+        Glide.with(getActivity()).load(uri).into(imBtnProfile);
     }
 
     private void findLocation() {
@@ -245,15 +279,28 @@ public class MapFragment extends BaseFragment {
 
     @OnClick(R.id.im_btn_new_order)
     void imBtnNewOrder() {
-        if (OrderStatusModel.OrderStatus.getOrderStatusModel().getIdUserOrderStatus() == null) {
+        if (UserModel.User.getUserModel().getIdCurrentOrder() == null) {
             ((MainActivity) getActivity()).changeFragment(CreateOrderFragment.newInstance());
         } else {
             new AlertDialog.Builder(getActivity())
-                    .setView(getActivity().getLayoutInflater().inflate(R.layout.item_current_order, null))
+                    .setView(initCurrentOrderView())
                     .setPositiveButton("EDIT", (dialog, which) -> makeToast("edit"))
                     .setNegativeButton("DELETE", (dialog, which) -> makeToast("delete"))
                     .setNeutralButton("BACK", (dialog, which) -> makeToast("back"))
                     .create().show();
         }
+    }
+
+    private View initCurrentOrderView() {
+        View view = getActivity().getLayoutInflater().inflate(R.layout.item_current_order, null);
+        ((TextView) ButterKnife.findById(view, R.id.text_from_order))
+                .setText(OrderModel.Order.getOrderModel().getFromOrder());
+        ((TextView) ButterKnife.findById(view, R.id.text_destination_order))
+                .setText(OrderModel.Order.getOrderModel().getDestinationOrder());
+        ((TextView) ButterKnife.findById(view, R.id.text_price_order))
+                .setText(OrderModel.Order.getOrderModel().getPriceOrder());
+        ((TextView) ButterKnife.findById(view, R.id.text_comment_order))
+                .setText(OrderModel.Order.getOrderModel().getCommentOrder());
+        return view;
     }
 }

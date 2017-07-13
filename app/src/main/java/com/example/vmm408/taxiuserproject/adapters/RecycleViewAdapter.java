@@ -10,24 +10,18 @@ import android.widget.TextView;
 import com.example.vmm408.taxiuserproject.R;
 import com.example.vmm408.taxiuserproject.models.RatingModel;
 
+import java.util.ArrayList;
 import java.util.List;
 
 import butterknife.BindView;
 import butterknife.ButterKnife;
 
 public class RecycleViewAdapter extends RecyclerView.Adapter<RecycleViewAdapter.CustomViewHolder> {
-    private List<RatingModel> ratingModelList;
-    private RecyclerViewClickListener clickListener;
+    private List<RatingModel> ratingModelList = new ArrayList<>();
 
-    public RecycleViewAdapter(List<RatingModel> ratingModelList,
-                              RecyclerViewClickListener clickListener) {
-        this.ratingModelList = ratingModelList;
-        this.clickListener = clickListener;
-    }
-
-    @Override
-    public long getItemId(int position) {
-        return super.getItemId(position);
+    public void addList(List<RatingModel> ratingModelList) {
+        this.ratingModelList.addAll(ratingModelList);
+        notifyDataSetChanged();
     }
 
     @Override
@@ -40,7 +34,8 @@ public class RecycleViewAdapter extends RecyclerView.Adapter<RecycleViewAdapter.
     public void onBindViewHolder(CustomViewHolder holder, int position) {
         holder.itemImageAvatar.setImageResource(R.mipmap.ic_launcher);
         holder.itemTextTitle.setText(ratingModelList.get(position).getIdUserRating());
-        holder.itemTextSubTitle.setText(ratingModelList.get(position).getCommentsRating());
+        holder.itemTextComment.setText(ratingModelList.get(position).getCommentsRating());
+        holder.itemView.setOnClickListener(v -> System.out.println(ratingModelList.get(position)));
     }
 
     @Override
@@ -48,23 +43,19 @@ public class RecycleViewAdapter extends RecyclerView.Adapter<RecycleViewAdapter.
         return ratingModelList.size();
     }
 
-    class CustomViewHolder extends RecyclerView.ViewHolder implements View.OnClickListener {
+    class CustomViewHolder extends RecyclerView.ViewHolder {
         @BindView(R.id.item_image_avatar)
         ImageView itemImageAvatar;
         @BindView(R.id.item_text_title)
         TextView itemTextTitle;
-        @BindView(R.id.item_text_sub_title)
-        TextView itemTextSubTitle;
+        @BindView(R.id.item_text_comment)
+        TextView itemTextComment;
+        private View itemView;
 
         CustomViewHolder(View itemView) {
             super(itemView);
+            this.itemView = itemView;
             ButterKnife.bind(this, itemView);
-            itemView.setOnClickListener(this);
-        }
-
-        @Override
-        public void onClick(View v) {
-            clickListener.recyclerViewListClicked(v, this.getLayoutPosition());
         }
     }
 }

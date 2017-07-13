@@ -4,11 +4,11 @@ import android.Manifest;
 import android.app.DatePickerDialog;
 import android.content.Intent;
 import android.content.pm.PackageManager;
+import android.database.Cursor;
 import android.graphics.Bitmap;
 import android.graphics.BitmapFactory;
 import android.net.Uri;
 import android.os.Bundle;
-import android.os.ParcelFileDescriptor;
 import android.provider.MediaStore;
 import android.support.annotation.Nullable;
 import android.support.v4.app.ActivityCompat;
@@ -19,7 +19,6 @@ import android.view.View;
 import android.view.ViewGroup;
 import android.widget.Button;
 import android.widget.EditText;
-import android.widget.LinearLayout;
 import android.widget.Spinner;
 import android.widget.TextView;
 
@@ -34,7 +33,6 @@ import java.io.IOException;
 import java.util.Calendar;
 
 import butterknife.BindView;
-import butterknife.ButterKnife;
 import butterknife.OnClick;
 import de.hdodenhof.circleimageview.CircleImageView;
 import id.zelory.compressor.Compressor;
@@ -59,9 +57,9 @@ public class SaveProfileFragment extends BaseFragment {
     TextView tAge;
     @BindView(R.id.btn_cancel_profile)
     Button btnCancelProfile;
-
     private String userId;
-    private String currentPhotoPath;
+    private Bitmap bitmapAvatar;
+    private String googlePhotoPath;
 
     @Nullable
     @Override
@@ -80,20 +78,41 @@ public class SaveProfileFragment extends BaseFragment {
 
     private void fillDataToWidgets() {
         Bundle bundle = getArguments();
-        if (!bundle.isEmpty() && bundle.getBoolean("editMode")) {
-            userId = UserModel.User.getUserModel().getIdUser();
-            etFullName.setText(UserModel.User.getUserModel().getFullNameUser());
-            etPhone.setText(UserModel.User.getUserModel().getPhoneUser());
-            tAge.setText(UserModel.User.getUserModel().getAgeUser());
-            btnCancelProfile.setVisibility(View.VISIBLE);
+        if (bundle.getBoolean("editMode")) {
+            fillWidgetsFromEditMode();
             return;
         }
-        if (!bundle.isEmpty()) {
-            userId = bundle.getString("userId");
-            currentPhotoPath = bundle.getString("photo");
-            Glide.with(getActivity()).load(bundle.getString("photo")).into(imageUserAvatar);
-            etFullName.setText(bundle.getString("fullName"));
+        userId = bundle.getString("userId");
+        googlePhotoPath = bundle.getString("photo");
+        downloadPhotoUri(bundle.getString("photo"));
+        etFullName.setText(bundle.getString("fullName"));
+    }
+
+    private void fillWidgetsFromEditMode() {
+        initAvatar();
+        userId = UserModel.User.getUserModel().getIdUser();
+        etFullName.setText(UserModel.User.getUserModel().getFullNameUser());
+        etPhone.setText(UserModel.User.getUserModel().getPhoneUser());
+        tAge.setText(UserModel.User.getUserModel().getAgeUser());
+        btnCancelProfile.setVisibility(View.VISIBLE);
+    }
+
+    private void initAvatar() {
+        String avatar = UserModel.User.getUserModel().getAvatarUser();
+        if (avatar == null) {
+            imageUserAvatar.setImageResource(R.mipmap.ic_launcher);
+        } else if (avatar.startsWith("https://lh3.googleusercontent.com/")) {
+            downloadPhotoUri(avatar);
+            googlePhotoPath = avatar;
+        } else {
+            byte[] imageBytes = Base64.decode(UserModel.User.getUserModel().getAvatarUser(), Base64.DEFAULT);
+            bitmapAvatar = BitmapFactory.decodeByteArray(imageBytes, 0, imageBytes.length);
+            imageUserAvatar.setImageBitmap(bitmapAvatar);
         }
+    }
+
+    private void downloadPhotoUri(String uri) {
+        Glide.with(getActivity()).load(uri).into(imageUserAvatar);
     }
 
     private boolean selfPermissionGranted() {
@@ -142,42 +161,33 @@ public class SaveProfileFragment extends BaseFragment {
             startActivityForResult(new Intent(Intent.ACTION_PICK, MediaStore.Images.Media.INTERNAL_CONTENT_URI), key);
         } else {
             imageUserAvatar.setImageResource(R.mipmap.ic_launcher);
+            bitmapAvatar = null;
+            googlePhotoPath = null;
         }
     }
 
     @Override
     public void onActivityResult(int requestCode, int resultCode, Intent data) {
         super.onActivityResult(requestCode, resultCode, data);
+        if (data == null) return;
         if (requestCode == IMAGE_CAPTURE_KEY) {
-            imageUserAvatar.setImageBitmap((Bitmap) data.getExtras().get("data"));
+            bitmapAvatar = (Bitmap) data.getExtras().get("data");
         } else if (requestCode == PICK_PHOTO_KEY) {
-            try {
-                currentPhotoPath = data.getData().getPath();
-                imageUserAvatar.setImageBitmap(MediaStore.Images.Media.getBitmap(
-                        getActivity().getContentResolver(), data.getData()));
-            } catch (IOException e) {
-                e.printStackTrace();
-            }
+            bitmapAvatar = new Compressor(getActivity()).compressToBitmap(new File(getPathFromURI(data.getData())));
         }
+        imageUserAvatar.setImageBitmap(bitmapAvatar);
+        googlePhotoPath = null;
     }
 
-    private String fromFileToString() {
-        Bitmap bitmap = new Compressor(getActivity()).compressToBitmap(new File(currentPhotoPath));
-        ByteArrayOutputStream baos = new ByteArrayOutputStream();
-        bitmap.compress(Bitmap.CompressFormat.JPEG, 100, baos);
-        byte[] imageBytes = baos.toByteArray();
-        String imageString = Base64.encodeToString(imageBytes, Base64.DEFAULT);
-        return imageString;
-//        ByteArrayOutputStream byteArrayOutputStream = new ByteArrayOutputStream();
-//        new Compressor(getActivity()).compressToBitmap(new File(currentPhotoPath))
-//                .compress(Bitmap.CompressFormat.PNG, 80, byteArrayOutputStream);
-//        return Base64.encodeToString(byteArrayOutputStream.toByteArray(), Base64.DEFAULT);
-    }
-
-    private Bitmap getBitmapFromUri(Uri uri) throws IOException {
-        ParcelFileDescriptor parcelFileDescriptor = getActivity().getContentResolver().openFileDescriptor(uri, "r");
-        parcelFileDescriptor.close();
-        return BitmapFactory.decodeFileDescriptor(parcelFileDescriptor.getFileDescriptor());
+    public String getPathFromURI(Uri uri) {
+        Cursor cursor = null;
+        try {
+            cursor = getActivity().getContentResolver().query(uri, new String[]{"_data"}, null, null, null);
+            if (cursor != null && cursor.moveToFirst()) return cursor.getString(cursor.getColumnIndexOrThrow("_data"));
+        } finally {
+            if (cursor != null) cursor.close();
+        }
+        return null;
     }
 
     @OnClick(R.id.btn_save_profile)
@@ -191,12 +201,22 @@ public class SaveProfileFragment extends BaseFragment {
 
     private UserModel initUserData() {
         UserModel.User.getUserModel().setIdUser(userId);
-//        UserModel.User.getUserModel().setAvatarUser(fromFileToString());
+        UserModel.User.getUserModel().setAvatarUser(googlePhotoPath != null ? googlePhotoPath : fromFileToString());
         UserModel.User.getUserModel().setFullNameUser(etFullName.getText().toString());
         UserModel.User.getUserModel().setPhoneUser(etPhone.getText().toString());
         UserModel.User.getUserModel().setGenderUser(spGender.getSelectedItem().toString());
         UserModel.User.getUserModel().setAgeUser(tAge.getText().toString());
         return UserModel.User.getUserModel();
+    }
+
+    private String fromFileToString() {
+        if (bitmapAvatar != null) {
+            ByteArrayOutputStream baos = new ByteArrayOutputStream();
+            bitmapAvatar.compress(Bitmap.CompressFormat.JPEG, 80, baos);
+            return Base64.encodeToString(baos.toByteArray(), Base64.DEFAULT);
+        } else {
+            return null;
+        }
     }
 
     @OnClick(R.id.btn_cancel_profile)

@@ -27,7 +27,9 @@ public class AuthenticationActivity extends AppCompatActivity {
 
     @Override
     public void onBackPressed() {
-        super.onBackPressed();
+        if (fragment instanceof SignInFragment) {
+            moveTaskToBack(true);
+        }
     }
 
     public void changeFragment(Fragment fragment) {

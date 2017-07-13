@@ -2,6 +2,7 @@ package com.example.vmm408.taxiuserproject.fragments;
 
 import android.os.Bundle;
 import android.support.annotation.Nullable;
+import android.support.v7.widget.DividerItemDecoration;
 import android.support.v7.widget.LinearLayoutManager;
 import android.support.v7.widget.RecyclerView;
 import android.view.LayoutInflater;
@@ -9,8 +10,8 @@ import android.view.View;
 import android.view.ViewGroup;
 
 import com.example.vmm408.taxiuserproject.R;
+import com.example.vmm408.taxiuserproject.adapters.EndlessScrollListener;
 import com.example.vmm408.taxiuserproject.adapters.RecycleViewAdapter;
-import com.example.vmm408.taxiuserproject.adapters.RecyclerViewClickListener;
 import com.example.vmm408.taxiuserproject.models.RatingModel;
 
 import java.util.ArrayList;
@@ -18,14 +19,22 @@ import java.util.List;
 
 import butterknife.BindView;
 
-public class RatingFragment extends BaseFragment implements RecyclerViewClickListener {
+public class RatingFragment extends BaseFragment {
     public static RatingFragment newInstance() {
         return new RatingFragment();
     }
 
     @BindView(R.id.recycler_view_container)
     RecyclerView recyclerViewContainer;
-    List<RatingModel> ratingModels = new ArrayList<>();
+    private List<RatingModel> ratingModels = new ArrayList<>(); // temp
+    private RecycleViewAdapter recycleViewAdapter;
+    private LinearLayoutManager linearLayoutManager = new LinearLayoutManager(getContext());
+    private EndlessScrollListener endlessScrollListener = new EndlessScrollListener(linearLayoutManager) {
+        @Override
+        public void onLoadMore(int page, int totalItemsCount, RecyclerView view) {
+            loadMore(page);
+        }
+    };
 
     @Nullable
     @Override
@@ -38,7 +47,13 @@ public class RatingFragment extends BaseFragment implements RecyclerViewClickLis
     @Override
     public void onViewCreated(View view, @Nullable Bundle savedInstanceState) {
         super.onViewCreated(view, savedInstanceState);
+        tempArrayList();
+        initRecycleView();
+        loadMore(0);
+    }
 
+    // temp
+    private void tempArrayList() {
         ratingModels = new ArrayList<>();
         for (int i = 0; i < 500; i++) {
             RatingModel ratingModel = new RatingModel();
@@ -46,15 +61,22 @@ public class RatingFragment extends BaseFragment implements RecyclerViewClickLis
             ratingModel.setCommentsRating("My new Comment aaaaaaa aaaaaa aaaaaaa aaaaaa aaaaaaa aaaaaa; " + i);
             ratingModels.add(ratingModel);
         }
-
-        recyclerViewContainer.setLayoutManager(new LinearLayoutManager(getContext()));
-        recyclerViewContainer.setAdapter(new RecycleViewAdapter(ratingModels, this));
-//        recyclerViewContainer.addItemDecoration();
     }
 
-    @Override
-    public void recyclerViewListClicked(View v, int position) {
-        makeToast(String.valueOf(ratingModels.get(position)));
+    private void initRecycleView() {
+        recyclerViewContainer.setLayoutManager(linearLayoutManager);
+        recyclerViewContainer.setAdapter(recycleViewAdapter = new RecycleViewAdapter());
+        recyclerViewContainer.addItemDecoration(new DividerItemDecoration(getActivity(), LinearLayoutManager.VERTICAL));
+        recyclerViewContainer.addOnScrollListener(endlessScrollListener);
     }
 
+    private void loadMore(int offset) {
+        List<RatingModel> tempList = new ArrayList<>();
+        for (int i = 10 * offset; i < (10 * offset) + 10; i++) {
+            tempList.add(ratingModels.get(i));
+//            Query query= FirebaseDatabase.getInstance().getReference();
+//            query.
+        }
+        recycleViewAdapter.addList(tempList);
+    }
 }

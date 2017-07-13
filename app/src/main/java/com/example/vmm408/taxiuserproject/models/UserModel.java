@@ -1,8 +1,5 @@
 package com.example.vmm408.taxiuserproject.models;
 
-import java.util.ArrayList;
-import java.util.List;
-
 public class UserModel {
     private String idUser;
     private String avatarUser;
@@ -10,13 +7,12 @@ public class UserModel {
     private String genderUser;
     private String ageUser;
     private String phoneUser;
+    private double ratingUser;
+    private String idCurrentOrder;
 
     private double experienceDriver;
     private String carModelDriver;
     private String numPlateCarDriver;
-
-    private List<OrderModel> orderModelList = new ArrayList<>();
-    private List<RatingModel> ratingModelList = new ArrayList<>();
 
     public void setIdUser(String idUser) {
         this.idUser = idUser;
@@ -66,6 +62,22 @@ public class UserModel {
         return phoneUser;
     }
 
+    public void setRatingUser(double ratingUser) {
+        this.ratingUser = ratingUser;
+    }
+
+    public double getRatingUser() {
+        return ratingUser;
+    }
+
+    public void setIdCurrentOrder(String idCurrentOrder) {
+        this.idCurrentOrder = idCurrentOrder;
+    }
+
+    public String getIdCurrentOrder() {
+        return idCurrentOrder;
+    }
+
     public void setExperienceDriver(double experienceDriver) {
         this.experienceDriver = experienceDriver;
     }
@@ -90,22 +102,6 @@ public class UserModel {
         return numPlateCarDriver;
     }
 
-    public void setOrderModelList(List<OrderModel> orderModelList) {
-        this.orderModelList = orderModelList;
-    }
-
-    public List<OrderModel> getOrderModelList() {
-        return orderModelList;
-    }
-
-    public void setRatingModelList(List<RatingModel> ratingModelList) {
-        this.ratingModelList = ratingModelList;
-    }
-
-    public List<RatingModel> getRatingModelList() {
-        return ratingModelList;
-    }
-
     public static class User {
         private static UserModel userModel = new UserModel();
 
@@ -116,22 +112,5 @@ public class UserModel {
         public static UserModel getUserModel() {
             return userModel;
         }
-    }
-
-    @Override
-    public String toString() {
-        return "UserModel{" +
-                "idUser=" + idUser +
-                ", avatarUser=" + avatarUser +
-                ", fullNameUser='" + fullNameUser + '\'' +
-                ", genderUser='" + genderUser + '\'' +
-                ", ageUser=" + ageUser +
-                ", phoneUser='" + phoneUser + '\'' +
-                ", experienceDriver=" + experienceDriver +
-                ", carModelDriver='" + carModelDriver + '\'' +
-                ", numPlateCarDriver='" + numPlateCarDriver + '\'' +
-                ", orderModelList=" + orderModelList +
-                ", ratingModelList=" + ratingModelList +
-                '}';
     }
 }

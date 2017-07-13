@@ -1,11 +1,13 @@
 package com.example.vmm408.taxiuserproject.models;
 
+import java.util.Date;
+
 public class RatingModel {
     private String idUserRating;
-    private String commentsRating;
+    private String idUserAuthorRating;
+    private Date timeRating;
     private int starsRating;
-
-    private UserModel userModel;
+    private String commentsRating;
 
     public void setIdUserRating(String idUserRating) {
         this.idUserRating = idUserRating;
@@ -15,12 +17,20 @@ public class RatingModel {
         return idUserRating;
     }
 
-    public void setCommentsRating(String commentsRating) {
-        this.commentsRating = commentsRating;
+    public void setIdUserAuthorRating(String idUserAuthorRating) {
+        this.idUserAuthorRating = idUserAuthorRating;
     }
 
-    public String getCommentsRating() {
-        return commentsRating;
+    public String getIdUserAuthorRating() {
+        return idUserAuthorRating;
+    }
+
+    public void setTimeRating(Date timeRating) {
+        this.timeRating = timeRating;
+    }
+
+    public Date getTimeRating() {
+        return timeRating;
     }
 
     public void setStarsRating(int starsRating) {
@@ -31,13 +41,11 @@ public class RatingModel {
         return starsRating;
     }
 
-    @Override
-    public String toString() {
-        return "RatingModel{" +
-                "idUserRating='" + idUserRating + '\'' +
-                ", commentsRating='" + commentsRating + '\'' +
-                ", starsRating=" + starsRating +
-                ", userModel=" + userModel +
-                '}';
+    public void setCommentsRating(String commentsRating) {
+        this.commentsRating = commentsRating;
+    }
+
+    public String getCommentsRating() {
+        return commentsRating;
     }
 }

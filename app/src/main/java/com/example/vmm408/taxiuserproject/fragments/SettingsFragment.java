@@ -45,6 +45,8 @@ public class SettingsFragment extends BaseFragment {
     }
 
     private void signOut() {
+//        googleApiClient.disconnect();
+//        googleApiClient.clearDefaultAccountAndReconnect();
         (getContext().getSharedPreferences("UserProfile", Context.MODE_APPEND)
                 .edit()).remove("userId").apply();
         startActivity(new Intent(getActivity(), AuthenticationActivity.class));
