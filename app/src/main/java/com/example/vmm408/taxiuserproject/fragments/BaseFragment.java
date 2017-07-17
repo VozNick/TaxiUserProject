@@ -24,7 +24,7 @@ public class BaseFragment extends Fragment {
     private Unbinder unbinder;
     protected FirebaseDatabase mDatabase;
     protected DatabaseReference mReference;
-    protected Gson gson = new GsonBuilder().create();
+        protected Gson gson = new GsonBuilder().create();
     protected ProgressDialog progressDialog;
     protected GoogleApiClient googleApiClient;
 
@@ -42,28 +42,16 @@ public class BaseFragment extends Fragment {
     }
 
     protected boolean validate(EditText editText) {
-        String errorMessage = findError(editText);
-        if (errorMessage == null) {
-            return true;
-        }
-        editText.setError(errorMessage);
-        return false;
-    }
-
-    private String findError(EditText editText) {
         String data = editText.getText().toString();
-        if (data.isEmpty()) return "can't be empty fields";
-        if (editText.getId() == R.id.edit_text_phone &&
-                !Patterns.PHONE.matcher(data).matches()) return "wrong phone format";
-        return null;
-    }
-
-    protected boolean validate(int position) {
-        if (position != 0) {
-            return true;
+        if (data.isEmpty()) {
+            editText.setError("can't be empty fields");
+            return false;
         }
-        makeToast("fill in spinners");
-        return false;
+        if (editText.getId() == R.id.edit_text_phone && !Patterns.PHONE.matcher(data).matches()) {
+            editText.setError("wrong phone format");
+            return false;
+        }
+        return true;
     }
 
     protected void saveToShared(String userId) {

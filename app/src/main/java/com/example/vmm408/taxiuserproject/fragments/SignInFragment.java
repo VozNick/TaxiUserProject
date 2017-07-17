@@ -22,6 +22,7 @@ import com.google.android.gms.common.SignInButton;
 import com.google.android.gms.common.api.GoogleApiClient;
 import com.google.firebase.database.DataSnapshot;
 import com.google.firebase.database.DatabaseError;
+import com.google.firebase.database.Query;
 import com.google.firebase.database.ValueEventListener;
 
 import butterknife.BindView;
@@ -86,19 +87,22 @@ public class SignInFragment extends BaseFragment
     private void handleSignInResult(GoogleSignInResult result) {
         if (result.isSuccess()) {
             signInAccount = result.getSignInAccount();
-            (mReference = mDatabase.getReference("users")).addListenerForSingleValueEvent(this);
+//            Query query = (mReference = mDatabase.getReference("users"));
+//            query.orderByValue().equalTo(signInAccount.getId())
+            (mReference = mDatabase.getReference("users"))
+                    .child(signInAccount.getId())
+                    .addListenerForSingleValueEvent(this);
         }
     }
 
     @Override
     public void onDataChange(DataSnapshot dataSnapshot) {
-        for (DataSnapshot snapshot : dataSnapshot.getChildren()) {
-            if (signInAccount.getId().equals(snapshot.getKey())) {
-                super.saveToShared(snapshot.getKey());
-                progressDialog.dismiss();
-                startActivity(new Intent(getActivity(), MainActivity.class));
-                return;
-            }
+        System.out.println(dataSnapshot);
+        if (signInAccount.getId().equals(dataSnapshot.getKey())) {
+            super.saveToShared(dataSnapshot.getKey());
+            progressDialog.dismiss();
+            startActivity(new Intent(getActivity(), MainActivity.class));
+            return;
         }
         progressDialog.dismiss();
         ((AuthenticationActivity) getActivity()).changeFragment(initFragment());

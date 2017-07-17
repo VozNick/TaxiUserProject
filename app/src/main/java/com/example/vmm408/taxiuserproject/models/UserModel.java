@@ -8,11 +8,16 @@ public class UserModel {
     private String ageUser;
     private String phoneUser;
     private double ratingUser;
+    private String ratingNumUser;
+
     private String idCurrentOrder;
 
     private double experienceDriver;
     private String carModelDriver;
     private String numPlateCarDriver;
+
+    public UserModel() {
+    }
 
     public void setIdUser(String idUser) {
         this.idUser = idUser;
@@ -70,6 +75,14 @@ public class UserModel {
         return ratingUser;
     }
 
+    public void setRatingNumUser(String ratingNumUser) {
+        this.ratingNumUser = ratingNumUser;
+    }
+
+    public String getRatingNumUser() {
+        return ratingNumUser;
+    }
+
     public void setIdCurrentOrder(String idCurrentOrder) {
         this.idCurrentOrder = idCurrentOrder;
     }
@@ -112,5 +125,23 @@ public class UserModel {
         public static UserModel getUserModel() {
             return userModel;
         }
+    }
+
+    @Override
+    public String toString() {
+        return "UserModel{" +
+                "idUser='" + idUser + '\'' +
+                ", avatarUser='" + avatarUser + '\'' +
+                ", fullNameUser='" + fullNameUser + '\'' +
+                ", genderUser='" + genderUser + '\'' +
+                ", ageUser='" + ageUser + '\'' +
+                ", phoneUser='" + phoneUser + '\'' +
+                ", ratingUser=" + ratingUser +
+                ", ratingNumUser='" + ratingNumUser + '\'' +
+                ", idCurrentOrder='" + idCurrentOrder + '\'' +
+                ", experienceDriver=" + experienceDriver +
+                ", carModelDriver='" + carModelDriver + '\'' +
+                ", numPlateCarDriver='" + numPlateCarDriver + '\'' +
+                '}';
     }
 }

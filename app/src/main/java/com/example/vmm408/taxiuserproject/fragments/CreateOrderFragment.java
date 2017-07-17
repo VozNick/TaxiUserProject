@@ -28,6 +28,7 @@ public class CreateOrderFragment extends BaseFragment {
     EditText etOrderPrice;
     @BindView(R.id.edit_text_order_comment)
     EditText etOrderComment;
+    private String currentOrderKey;
 
     @Nullable
     @Override
@@ -49,26 +50,30 @@ public class CreateOrderFragment extends BaseFragment {
 
     @OnClick(R.id.btn_create_order)
     void btnCreateOrder() {
-        if (super.validate(etOrderFrom) &&
-                super.validate(etOrderDestination) &&
-                super.validate(etOrderPrice)) {
-
-            OrderModel.Order.getOrderModel().setIdUserOrder(UserModel.User.getUserModel().getIdUser());
-            OrderModel.Order.getOrderModel().setFromOrder(etOrderFrom.getText().toString());
-            OrderModel.Order.getOrderModel().setDestinationOrder(etOrderDestination.getText().toString());
-            OrderModel.Order.getOrderModel().setPriceOrder(Integer.parseInt(etOrderPrice.getText().toString()));
-            OrderModel.Order.getOrderModel().setCommentOrder(etOrderComment.getText().toString());
-//            OrderModel.Order.getOrderModel().setTimeOrder();
-            OrderModel.Order.getOrderModel().setOrderAccepted(false);
-
-            String currentOrderKey = (mReference = mDatabase.getReference("orders")).push().getKey();
+        if (super.validate(etOrderFrom) && super.validate(etOrderDestination) && super.validate(etOrderPrice)) {
+            currentOrderKey = (mReference = mDatabase.getReference("orders")).push().getKey();
             UserModel.User.getUserModel().setIdCurrentOrder(currentOrderKey);
-            mReference.child(currentOrderKey).setValue(OrderModel.Order.getOrderModel());
-            (mReference = mDatabase.getReference("users"))
-                    .child(UserModel.User.getUserModel().getIdUser())
-                    .child("idCurrentOrder")
-                    .setValue(currentOrderKey);
+            saveDataToBase();
             ((MainActivity) getActivity()).changeFragment(MapFragment.newInstance());
         }
+    }
+
+    private void saveDataToBase() {
+        mReference.child(currentOrderKey).setValue(initOrder());
+        (mReference = mDatabase.getReference("users"))
+                .child(UserModel.User.getUserModel().getIdUser())
+                .child("idCurrentOrder")
+                .setValue(currentOrderKey);
+    }
+
+    private OrderModel initOrder() {
+        OrderModel.Order.getOrderModel().setIdUserOrder(UserModel.User.getUserModel().getIdUser());
+        OrderModel.Order.getOrderModel().setFromOrder(etOrderFrom.getText().toString());
+        OrderModel.Order.getOrderModel().setDestinationOrder(etOrderDestination.getText().toString());
+        OrderModel.Order.getOrderModel().setPriceOrder(Integer.parseInt(etOrderPrice.getText().toString()));
+        OrderModel.Order.getOrderModel().setCommentOrder(etOrderComment.getText().toString());
+//            OrderModel.Order.getOrderModel().setTimeOrder();
+        OrderModel.Order.getOrderModel().setOrderAccepted(false);
+        return OrderModel.Order.getOrderModel();
     }
 }

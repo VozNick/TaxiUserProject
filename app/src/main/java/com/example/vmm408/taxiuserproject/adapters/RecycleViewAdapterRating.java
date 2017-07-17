@@ -16,7 +16,8 @@ import java.util.List;
 import butterknife.BindView;
 import butterknife.ButterKnife;
 
-public class RecycleViewAdapter extends RecyclerView.Adapter<RecycleViewAdapter.CustomViewHolder> {
+public class RecycleViewAdapterRating extends
+        RecyclerView.Adapter<RecycleViewAdapterRating.CustomViewHolder> {
     private List<RatingModel> ratingModelList = new ArrayList<>();
 
     public void addList(List<RatingModel> ratingModelList) {

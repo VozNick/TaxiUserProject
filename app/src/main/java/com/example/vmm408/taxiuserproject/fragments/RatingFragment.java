@@ -11,8 +11,12 @@ import android.view.ViewGroup;
 
 import com.example.vmm408.taxiuserproject.R;
 import com.example.vmm408.taxiuserproject.adapters.EndlessScrollListener;
-import com.example.vmm408.taxiuserproject.adapters.RecycleViewAdapter;
+import com.example.vmm408.taxiuserproject.adapters.RecycleViewAdapterRating;
 import com.example.vmm408.taxiuserproject.models.RatingModel;
+import com.example.vmm408.taxiuserproject.models.UserModel;
+import com.google.firebase.database.DataSnapshot;
+import com.google.firebase.database.DatabaseError;
+import com.google.firebase.database.ValueEventListener;
 
 import java.util.ArrayList;
 import java.util.List;
@@ -27,7 +31,7 @@ public class RatingFragment extends BaseFragment {
     @BindView(R.id.recycler_view_container)
     RecyclerView recyclerViewContainer;
     private List<RatingModel> ratingModels = new ArrayList<>(); // temp
-    private RecycleViewAdapter recycleViewAdapter;
+    private RecycleViewAdapterRating recycleViewAdapter;
     private LinearLayoutManager linearLayoutManager = new LinearLayoutManager(getContext());
     private EndlessScrollListener endlessScrollListener = new EndlessScrollListener(linearLayoutManager) {
         @Override
@@ -65,7 +69,7 @@ public class RatingFragment extends BaseFragment {
 
     private void initRecycleView() {
         recyclerViewContainer.setLayoutManager(linearLayoutManager);
-        recyclerViewContainer.setAdapter(recycleViewAdapter = new RecycleViewAdapter());
+        recyclerViewContainer.setAdapter(recycleViewAdapter = new RecycleViewAdapterRating());
         recyclerViewContainer.addItemDecoration(new DividerItemDecoration(getActivity(), LinearLayoutManager.VERTICAL));
         recyclerViewContainer.addOnScrollListener(endlessScrollListener);
     }
@@ -74,8 +78,19 @@ public class RatingFragment extends BaseFragment {
         List<RatingModel> tempList = new ArrayList<>();
         for (int i = 10 * offset; i < (10 * offset) + 10; i++) {
             tempList.add(ratingModels.get(i));
-//            Query query= FirebaseDatabase.getInstance().getReference();
-//            query.
+            (mReference = mDatabase.getReference("ratings"))
+                    .equalTo(UserModel.User.getUserModel().getIdUser())
+                    .addValueEventListener(new ValueEventListener() {
+                        @Override
+                        public void onDataChange(DataSnapshot dataSnapshot) {
+
+                        }
+
+                        @Override
+                        public void onCancelled(DatabaseError databaseError) {
+
+                        }
+                    });
         }
         recycleViewAdapter.addList(tempList);
     }

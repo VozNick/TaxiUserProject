@@ -11,15 +11,20 @@ import android.location.LocationManager;
 import android.os.Bundle;
 import android.support.annotation.NonNull;
 import android.support.annotation.Nullable;
+import android.support.design.widget.FloatingActionButton;
 import android.support.v4.app.ActivityCompat;
 import android.support.v4.app.Fragment;
 import android.support.v7.app.AlertDialog;
+import android.support.v7.app.AppCompatActivity;
 import android.support.v7.widget.SearchView;
+import android.support.v7.widget.Toolbar;
 import android.util.Base64;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
+import android.widget.ArrayAdapter;
 import android.widget.ImageView;
+import android.widget.LinearLayout;
 import android.widget.TextView;
 import android.widget.Toast;
 
@@ -39,6 +44,7 @@ import com.google.firebase.database.DatabaseError;
 import com.google.firebase.database.ValueEventListener;
 
 import java.io.IOException;
+import java.util.ArrayList;
 import java.util.List;
 import java.util.Locale;
 
@@ -60,50 +66,33 @@ public class MapFragment extends BaseFragment {
     ImageView imBtnClearSearch;
     @BindView(R.id.im_btn_profile)
     CircleImageView imBtnProfile;
+    @BindView(R.id.search_view_container)
+    LinearLayout searchViewContainer;
+    @BindView(R.id.fab_new_order)
+    FloatingActionButton fabNewOrder;
     private LocationManager mLocationManager;
     private Location mLocation;
     private GoogleMap mMap;
     private SearchView.SearchAutoComplete searchAutoComplete;
+    private List<String> searchAddressList = new ArrayList<>();
     private ValueEventListener findUserInBase = new ValueEventListener() {
         @Override
         public void onDataChange(DataSnapshot dataSnapshot) {
-            try {
-                UserModel.User.getUserModel()
-                        .setAvatarUser(dataSnapshot.child("avatarUser").getValue().toString());
-            } catch (Exception e) {
-                e.printStackTrace();
-            }
-            UserModel.User.getUserModel()
-                    .setIdUser(dataSnapshot.child("idUser").getValue().toString());
-            UserModel.User.getUserModel()
-                    .setFullNameUser(dataSnapshot.child("fullNameUser").getValue().toString());
-            UserModel.User.getUserModel()
-                    .setPhoneUser(dataSnapshot.child("phoneUser").getValue().toString());
-            UserModel.User.getUserModel()
-                    .setGenderUser(dataSnapshot.child("genderUser").getValue().toString());
-            UserModel.User.getUserModel()
-                    .setAgeUser(dataSnapshot.child("ageUser").getValue().toString());
+            UserModel.User.setUserModel(dataSnapshot.getValue(UserModel.class));
         }
 
         @Override
         public void onCancelled(DatabaseError databaseError) {
         }
     };
-    private SearchView.OnQueryTextListener mTextListener = new SearchView.OnQueryTextListener() {
+    private ValueEventListener findCurrentOrderInBase = new ValueEventListener() {
         @Override
-        public boolean onQueryTextSubmit(String query) {
-            searchViewAppBar.clearFocus();
-            return true;
+        public void onDataChange(DataSnapshot dataSnapshot) {
+            OrderModel.Order.setOrderModel(dataSnapshot.getValue(OrderModel.class));
         }
 
         @Override
-        public boolean onQueryTextChange(String newText) {
-            imBtnClearSearch.setVisibility(newText.length() > 0 ? View.VISIBLE : View.GONE);
-            if (newText.length() > 2) {
-            }
-//            searchAutoComplete.setAdapter(new ArrayAdapter<>(getActivity(), android.R.layout.simple_list_item_1, temp));
-//            searchAutoComplete.showDropDown();
-            return false;
+        public void onCancelled(DatabaseError databaseError) {
         }
     };
     private LocationListener mLocationListener = new LocationListener() {
@@ -140,25 +129,18 @@ public class MapFragment extends BaseFragment {
     public void onViewCreated(View view, @Nullable Bundle savedInstanceState) {
         super.onViewCreated(view, savedInstanceState);
         if (UserModel.User.getUserModel().getIdUser() == null)
-            (mReference = mDatabase.getReference("users")).child(super.userSigned())
+            (mReference = mDatabase.getReference("users"))
+                    .child(super.userSigned())
                     .addListenerForSingleValueEvent(findUserInBase);
-        initSearchView();
-        initAutoComplete();
+
+        if (UserModel.User.getUserModel().getIdCurrentOrder() != null)
+            (mReference = mDatabase.getReference("orders"))
+                    .child(UserModel.User.getUserModel().getIdCurrentOrder())
+                    .addListenerForSingleValueEvent(findCurrentOrderInBase);
+
         initAvatar();
-        findLocation();
         initMapFragment();
-    }
-
-    private void initSearchView() {
-        searchViewAppBar.setIconified(false);
-        searchViewAppBar.setQueryHint("Search here...");
-        searchViewAppBar.setOnQueryTextListener(mTextListener);
-    }
-
-    private void initAutoComplete() {
-//        searchAutoComplete = (SearchView.SearchAutoComplete) searchViewAppBar.findViewById(R.id.search_src_text);
-//        searchAutoComplete.setOnItemClickListener((parent, view, position, id) -> searchViewAppBar
-//                .setQuery(userModels.get(position).getName(), true));
+        findLocation();
     }
 
     private void initAvatar() {
@@ -177,6 +159,19 @@ public class MapFragment extends BaseFragment {
         Glide.with(getActivity()).load(uri).into(imBtnProfile);
     }
 
+    private void initMapFragment() {
+        ((SupportMapFragment) getChildFragmentManager().findFragmentById(R.id.map))
+                .getMapAsync(googleMap -> {
+                    mMap = googleMap;
+                    mMap.setOnMapClickListener((latLng -> {
+                        mMap.clear();
+                        searchViewAppBar.clearFocus();
+                    }));
+                    mMap.setOnMapLongClickListener(this::initMarkerFromLocation);
+                    mMap.setOnMarkerClickListener(marker -> false);
+                });
+    }
+
     private void findLocation() {
         if (!checkSelfPermission()) requestPermissions();
         try {
@@ -186,15 +181,6 @@ public class MapFragment extends BaseFragment {
         } catch (Exception e) {
             e.printStackTrace();
         }
-    }
-
-    private void initMapFragment() {
-        ((SupportMapFragment) getChildFragmentManager().findFragmentById(R.id.map)).getMapAsync(googleMap -> {
-            mMap = googleMap;
-            mMap.setOnMapClickListener((latLng -> mMap.clear()));
-            mMap.setOnMapLongClickListener(this::initMarkerFromLocation);
-            mMap.setOnMarkerClickListener(marker -> false);
-        });
     }
 
     @Override
@@ -219,14 +205,120 @@ public class MapFragment extends BaseFragment {
                         Manifest.permission.ACCESS_COARSE_LOCATION}, 123);
     }
 
+    @OnClick(R.id.toolbar)
+    void toolbar() {
+        searchViewContainer.setVisibility(View.VISIBLE);
+        initSearchView();
+    }
+
+    private void initSearchView() {
+        searchViewAppBar.setIconified(false);
+        searchViewAppBar.setQueryHint("Search here...");
+        searchViewAppBar.setOnQueryTextListener(new SearchView.OnQueryTextListener() {
+            @Override
+            public boolean onQueryTextSubmit(String query) {
+                searchViewAppBar.clearFocus();
+                initMarkerFromName(query);
+                return true;
+            }
+
+            @Override
+            public boolean onQueryTextChange(String newText) {
+                imBtnClearSearch.setVisibility(newText.length() > 0 ? View.VISIBLE : View.GONE);
+                if (newText.length() > 2) {
+                    // rx method
+//                    mMap.clear();
+//                    try {
+//                        List<Address> addresses = new Geocoder(getContext(), Locale.getDefault())
+//                                .getFromLocationName(newText, 10);
+//                        for (int i = 0; i < addresses.size(); i++) {
+//                            searchAddressList.add(addresses.get(i).getAddressLine(0));
+//                            System.out.println(addresses.get(i));
+//                        }
+//                    } catch (IOException e) {
+//                        e.printStackTrace();
+//                    }
+                }
+//                searchAutoComplete.setAdapter(new ArrayAdapter<>(getActivity(),
+//                        android.R.layout.simple_list_item_1, searchAddressList));
+//                searchAutoComplete.showDropDown();
+                return true;
+            }
+        });
+    }
+
+    private void initAutoComplete() {
+        (searchAutoComplete = (SearchView.SearchAutoComplete) searchViewAppBar
+                .findViewById(R.id.search_src_text))
+                .setOnItemClickListener((parent, view, position, id) -> {
+                    searchViewAppBar.setQuery(searchAddressList.get(position), true);
+                    initMarkerFromName(searchAddressList.get(position));
+                });
+    }
+
+    public void initMarkerFromName(String name) {
+
+        mMap.clear();
+        try {
+            List<Address> addresses = new Geocoder(getContext(), Locale.getDefault())
+                    .getFromLocationName(name, 50);
+            for (int i = 0; i < addresses.size(); i++) {
+                mMap.addMarker(new MarkerOptions().position(new LatLng(addresses.get(i).getLatitude(),
+                        addresses.get(i).getLongitude())).title(addresses.get(i).getAddressLine(0)));
+                mMap.animateCamera(CameraUpdateFactory
+                        .newCameraPosition(
+                                new CameraPosition(
+                                        new LatLng(addresses.get(i).getLatitude(),
+                                                addresses.get(i).getLongitude()), 12f, 0f, 0f)));
+            }
+        } catch (IOException e) {
+            e.printStackTrace();
+        }
+    }
+
+    @OnClick(R.id.image_view_btn_back)
+    void imBtnBack() {
+        searchViewContainer.setVisibility(View.GONE);
+    }
+
     @OnClick(R.id.im_btn_clear_search)
     void imBtnClearSearch() {
         imBtnClearSearch.setVisibility(View.GONE);
         searchViewAppBar.setQuery("", false);
     }
 
-    @OnClick(R.id.im_btn_my_location)
-    void imageBtnMyLocation() {
+    @OnClick(R.id.im_btn_profile)
+    void imBtnProfile() {
+        new AlertDialog.Builder(getActivity()).setItems(R.array.menu_profile, (dialog, which) -> {
+            if (which == 0) {
+                ((MainActivity) getActivity()).changeFragment(initFragment());
+            } else if (which == 1) {
+                ((MainActivity) getActivity()).changeFragment(RatingFragment.newInstance());
+            } else if (which == 2) {
+                ((MainActivity) getActivity()).changeFragment(OrdersHistoryFragment.newInstance());
+            } else if (which == 3) {
+                ((MainActivity) getActivity()).changeFragment(SettingsFragment.newInstance());
+            }
+        }).create().show();
+    }
+
+    @OnClick(R.id.fab_new_order)
+    void fabNewOrder() {
+        if (UserModel.User.getUserModel().getIdCurrentOrder() == null) {
+            ((MainActivity) getActivity()).changeFragment(CreateOrderFragment.newInstance());
+        } else {
+            new AlertDialog.Builder(getActivity())
+                    .setView(initCurrentOrderView())
+                    .setPositiveButton("EDIT", (dialog, which) -> makeToast("edit"))
+                    .setNegativeButton("DELETE", (dialog, which) -> makeToast("delete"))
+                    .setNeutralButton("BACK", (dialog, which) -> dialog.dismiss())
+                    .create().show();
+        }
+    }
+
+
+    @OnClick(R.id.fab_my_location)
+    void fabMyLocation() {
         findLocation();
         try {
             initMarkerFromLocation(new LatLng(mLocation.getLatitude(), mLocation.getLongitude()));
@@ -247,23 +339,8 @@ public class MapFragment extends BaseFragment {
         } catch (IOException e) {
             e.printStackTrace();
         }
-
     }
 
-    @OnClick(R.id.im_btn_profile)
-    void imBtnProfile() {
-        new AlertDialog.Builder(getActivity()).setItems(R.array.menu_profile, (dialog, which) -> {
-            if (which == 0) {
-                ((MainActivity) getActivity()).changeFragment(initFragment());
-            } else if (which == 1) {
-                ((MainActivity) getActivity()).changeFragment(RatingFragment.newInstance());
-            } else if (which == 2) {
-                makeToast("Orders history");
-            } else if (which == 3) {
-                ((MainActivity) getActivity()).changeFragment(SettingsFragment.newInstance());
-            }
-        }).create().show();
-    }
 
     private Fragment initFragment() {
         Fragment fragment = SaveProfileFragment.newInstance();
@@ -277,20 +354,6 @@ public class MapFragment extends BaseFragment {
         return bundle;
     }
 
-    @OnClick(R.id.im_btn_new_order)
-    void imBtnNewOrder() {
-        if (UserModel.User.getUserModel().getIdCurrentOrder() == null) {
-            ((MainActivity) getActivity()).changeFragment(CreateOrderFragment.newInstance());
-        } else {
-            new AlertDialog.Builder(getActivity())
-                    .setView(initCurrentOrderView())
-                    .setPositiveButton("EDIT", (dialog, which) -> makeToast("edit"))
-                    .setNegativeButton("DELETE", (dialog, which) -> makeToast("delete"))
-                    .setNeutralButton("BACK", (dialog, which) -> makeToast("back"))
-                    .create().show();
-        }
-    }
-
     private View initCurrentOrderView() {
         View view = getActivity().getLayoutInflater().inflate(R.layout.item_current_order, null);
         ((TextView) ButterKnife.findById(view, R.id.text_from_order))
@@ -298,7 +361,7 @@ public class MapFragment extends BaseFragment {
         ((TextView) ButterKnife.findById(view, R.id.text_destination_order))
                 .setText(OrderModel.Order.getOrderModel().getDestinationOrder());
         ((TextView) ButterKnife.findById(view, R.id.text_price_order))
-                .setText(OrderModel.Order.getOrderModel().getPriceOrder());
+                .setText(String.valueOf(OrderModel.Order.getOrderModel().getPriceOrder()));
         ((TextView) ButterKnife.findById(view, R.id.text_comment_order))
                 .setText(OrderModel.Order.getOrderModel().getCommentOrder());
         return view;

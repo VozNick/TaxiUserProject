@@ -4,6 +4,9 @@ import android.content.Intent;
 import android.os.Bundle;
 import android.support.v4.app.Fragment;
 import android.support.v7.app.AppCompatActivity;
+import android.support.v7.widget.Toolbar;
+import android.view.Menu;
+import android.view.MenuItem;
 import android.widget.LinearLayout;
 
 import com.example.vmm408.taxiuserproject.fragments.MapFragment;
@@ -14,7 +17,7 @@ import butterknife.BindView;
 import butterknife.ButterKnife;
 
 public class MainActivity extends AppCompatActivity {
-    //    @BindView(R.id.toolbar)
+//    @BindView(R.id.toolbar)
 //    Toolbar toolbar;
     @BindView(R.id.activity_main_container)
     LinearLayout activityMainContainer;
@@ -26,6 +29,7 @@ public class MainActivity extends AppCompatActivity {
         setContentView(R.layout.activity_main);
         ButterKnife.bind(this);
 //        setSupportActionBar(toolbar);
+//        getSupportActionBar().setDisplayShowHomeEnabled(true);
 
         startService(new Intent(this, TaxiService.class));
         changeFragment(MapFragment.newInstance());
@@ -45,4 +49,5 @@ public class MainActivity extends AppCompatActivity {
         getSupportFragmentManager().beginTransaction()
                 .replace(activityMainContainer.getId(), fragment).commit();
     }
+
 }
