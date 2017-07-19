@@ -1,38 +1,36 @@
 package com.example.vmm408.taxiuserproject.fragments;
 
 import android.Manifest;
+import android.app.Activity;
 import android.content.pm.PackageManager;
 import android.graphics.BitmapFactory;
 import android.location.Address;
 import android.location.Geocoder;
 import android.location.Location;
-import android.location.LocationListener;
-import android.location.LocationManager;
 import android.os.Bundle;
-import android.support.annotation.NonNull;
 import android.support.annotation.Nullable;
 import android.support.design.widget.FloatingActionButton;
 import android.support.v4.app.ActivityCompat;
 import android.support.v4.app.Fragment;
 import android.support.v7.app.AlertDialog;
-import android.support.v7.app.AppCompatActivity;
 import android.support.v7.widget.SearchView;
-import android.support.v7.widget.Toolbar;
 import android.util.Base64;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
-import android.widget.ArrayAdapter;
 import android.widget.ImageView;
 import android.widget.LinearLayout;
-import android.widget.TextView;
 import android.widget.Toast;
 
 import com.bumptech.glide.Glide;
+import com.example.vmm408.taxiuserproject.CustomValueEventListener;
 import com.example.vmm408.taxiuserproject.MainActivity;
 import com.example.vmm408.taxiuserproject.R;
 import com.example.vmm408.taxiuserproject.models.OrderModel;
 import com.example.vmm408.taxiuserproject.models.UserModel;
+import com.example.vmm408.taxiuserproject.utils.Utils;
+import com.google.android.gms.location.FusedLocationProviderClient;
+import com.google.android.gms.location.LocationServices;
 import com.google.android.gms.maps.CameraUpdateFactory;
 import com.google.android.gms.maps.GoogleMap;
 import com.google.android.gms.maps.SupportMapFragment;
@@ -40,7 +38,6 @@ import com.google.android.gms.maps.model.CameraPosition;
 import com.google.android.gms.maps.model.LatLng;
 import com.google.android.gms.maps.model.MarkerOptions;
 import com.google.firebase.database.DataSnapshot;
-import com.google.firebase.database.DatabaseError;
 import com.google.firebase.database.ValueEventListener;
 
 import java.io.IOException;
@@ -49,11 +46,11 @@ import java.util.List;
 import java.util.Locale;
 
 import butterknife.BindView;
-import butterknife.ButterKnife;
 import butterknife.OnClick;
 import de.hdodenhof.circleimageview.CircleImageView;
 
-import static android.content.Context.LOCATION_SERVICE;
+import static com.example.vmm408.taxiuserproject.FirebaseDataBaseKeys.ORDERS_REF_KEY;
+import static com.example.vmm408.taxiuserproject.FirebaseDataBaseKeys.USERS_REF_KEY;
 
 public class MapFragment extends BaseFragment {
     public static MapFragment newInstance() {
@@ -70,50 +67,52 @@ public class MapFragment extends BaseFragment {
     LinearLayout searchViewContainer;
     @BindView(R.id.fab_new_order)
     FloatingActionButton fabNewOrder;
-    private LocationManager mLocationManager;
-    private Location mLocation;
-    private GoogleMap mMap;
+    private FusedLocationProviderClient client;
+    private Location location;
+    private GoogleMap map;
     private SearchView.SearchAutoComplete searchAutoComplete;
     private List<String> searchAddressList = new ArrayList<>();
-    private ValueEventListener findUserInBase = new ValueEventListener() {
+    private ValueEventListener findUserInBase = new CustomValueEventListener() {
         @Override
         public void onDataChange(DataSnapshot dataSnapshot) {
             UserModel.User.setUserModel(dataSnapshot.getValue(UserModel.class));
         }
-
-        @Override
-        public void onCancelled(DatabaseError databaseError) {
-        }
     };
-    private ValueEventListener findCurrentOrderInBase = new ValueEventListener() {
+    private ValueEventListener findCurrentOrderInBase = new CustomValueEventListener() {
         @Override
         public void onDataChange(DataSnapshot dataSnapshot) {
             OrderModel.Order.setOrderModel(dataSnapshot.getValue(OrderModel.class));
         }
-
-        @Override
-        public void onCancelled(DatabaseError databaseError) {
-        }
     };
-    private LocationListener mLocationListener = new LocationListener() {
+    private SearchView.OnQueryTextListener onQueryTextListener = new SearchView.OnQueryTextListener() {
         @Override
-        public void onLocationChanged(Location location) {
-
+        public boolean onQueryTextSubmit(String query) {
+            searchViewAppBar.clearFocus();
+            initMarkerFromName(query);
+            return true;
         }
 
         @Override
-        public void onStatusChanged(String provider, int status, Bundle extras) {
-
-        }
-
-        @Override
-        public void onProviderEnabled(String provider) {
-
-        }
-
-        @Override
-        public void onProviderDisabled(String provider) {
-
+        public boolean onQueryTextChange(String newText) {
+            imBtnClearSearch.setVisibility(newText.length() > 0 ? View.VISIBLE : View.GONE);
+            if (newText.length() > 2) {
+                // rx method
+//                    map.clear();
+//                    try {
+//                        List<Address> addresses = new Geocoder(getContext(), Locale.getDefault())
+//                                .getFromLocationName(newText, 10);
+//                        for (int i = 0; i < addresses.size(); i++) {
+//                            searchAddressList.add(addresses.get(i).getAddressLine(0));
+//                            System.out.println(addresses.get(i));
+//                        }
+//                    } catch (IOException e) {
+//                        e.printStackTrace();
+//                    }
+            }
+//                searchAutoComplete.setAdapter(new ArrayAdapter<>(getActivity(),
+//                        android.R.layout.simple_list_item_1, searchAddressList));
+//                searchAutoComplete.showDropDown();
+            return true;
         }
     };
 
@@ -128,19 +127,26 @@ public class MapFragment extends BaseFragment {
     @Override
     public void onViewCreated(View view, @Nullable Bundle savedInstanceState) {
         super.onViewCreated(view, savedInstanceState);
-        if (UserModel.User.getUserModel().getIdUser() == null)
-            (mReference = mDatabase.getReference("users"))
-                    .child(super.userSigned())
-                    .addListenerForSingleValueEvent(findUserInBase);
-
-        if (UserModel.User.getUserModel().getIdCurrentOrder() != null)
-            (mReference = mDatabase.getReference("orders"))
-                    .child(UserModel.User.getUserModel().getIdCurrentOrder())
-                    .addListenerForSingleValueEvent(findCurrentOrderInBase);
-
+        getDataFromBase();
         initAvatar();
         initMapFragment();
-        findLocation();
+        client = LocationServices.getFusedLocationProviderClient(getContext());
+        if (!checkSelfPermission()) {
+            requestPermissions();
+        } else {
+            getLastLocation();
+        }
+    }
+
+    private void getDataFromBase() {
+        if (UserModel.User.getUserModel().getIdUser() == null) {
+            reference = database.getReference(USERS_REF_KEY).child(new Utils().userSigned(getContext()));
+            reference.addListenerForSingleValueEvent(findUserInBase);
+        }
+        if (UserModel.User.getUserModel().getIdCurrentOrder() != null) {
+            reference = database.getReference(ORDERS_REF_KEY).child(UserModel.User.getUserModel().getIdCurrentOrder());
+            reference.addListenerForSingleValueEvent(findCurrentOrderInBase);
+        }
     }
 
     private void initAvatar() {
@@ -156,40 +162,29 @@ public class MapFragment extends BaseFragment {
     }
 
     private void downloadPhotoUri(String uri) {
-        Glide.with(getActivity()).load(uri).into(imBtnProfile);
+        Glide.with(getContext()).load(uri).into(imBtnProfile);
     }
 
     private void initMapFragment() {
-        ((SupportMapFragment) getChildFragmentManager().findFragmentById(R.id.map))
-                .getMapAsync(googleMap -> {
-                    mMap = googleMap;
-                    mMap.setOnMapClickListener((latLng -> {
-                        mMap.clear();
-                        searchViewAppBar.clearFocus();
-                    }));
-                    mMap.setOnMapLongClickListener(this::initMarkerFromLocation);
-                    mMap.setOnMarkerClickListener(marker -> false);
-                });
+        SupportMapFragment mapFrag = (SupportMapFragment) getChildFragmentManager().findFragmentById(R.id.map);
+        mapFrag.getMapAsync(googleMap -> {
+            this.map = googleMap;
+            this.map.setOnMapClickListener((latLng -> {
+                this.map.clear();
+                searchViewAppBar.clearFocus();
+            }));
+            this.map.setOnMapLongClickListener(this::initMarkerFromLocation);
+            this.map.setOnMarkerClickListener(marker -> false);
+        });
     }
 
-    private void findLocation() {
-        if (!checkSelfPermission()) requestPermissions();
-        try {
-            mLocationManager = (LocationManager) getContext().getSystemService(LOCATION_SERVICE);
-            mLocation = mLocationManager.getLastKnownLocation(LocationManager.PASSIVE_PROVIDER);
-            mLocationManager.requestLocationUpdates(LocationManager.GPS_PROVIDER, 0, 0, mLocationListener);
-        } catch (Exception e) {
-            e.printStackTrace();
-        }
-    }
-
-    @Override
-    public void onRequestPermissionsResult(int requestCode,
-                                           @NonNull String[] permissions,
-                                           @NonNull int[] grantResults) {
-        super.onRequestPermissionsResult(requestCode, permissions, grantResults);
-        if (!checkSelfPermission()) return;
-        mLocationManager.requestLocationUpdates(LocationManager.GPS_PROVIDER, 0, 0, mLocationListener);
+    @SuppressWarnings("MissingPermission")
+    private void getLastLocation() {
+        client.getLastLocation().addOnCompleteListener(getActivity(), task -> {
+            if (task.isSuccessful() && task.getResult() != null) {
+                location = task.getResult();
+            }
+        });
     }
 
     private boolean checkSelfPermission() {
@@ -200,7 +195,7 @@ public class MapFragment extends BaseFragment {
     }
 
     private void requestPermissions() {
-        ActivityCompat.requestPermissions(getActivity(),
+        ActivityCompat.requestPermissions((Activity) getContext(),
                 new String[]{Manifest.permission.ACCESS_FINE_LOCATION,
                         Manifest.permission.ACCESS_COARSE_LOCATION}, 123);
     }
@@ -213,63 +208,28 @@ public class MapFragment extends BaseFragment {
 
     private void initSearchView() {
         searchViewAppBar.setIconified(false);
-        searchViewAppBar.setQueryHint("Search here...");
-        searchViewAppBar.setOnQueryTextListener(new SearchView.OnQueryTextListener() {
-            @Override
-            public boolean onQueryTextSubmit(String query) {
-                searchViewAppBar.clearFocus();
-                initMarkerFromName(query);
-                return true;
-            }
-
-            @Override
-            public boolean onQueryTextChange(String newText) {
-                imBtnClearSearch.setVisibility(newText.length() > 0 ? View.VISIBLE : View.GONE);
-                if (newText.length() > 2) {
-                    // rx method
-//                    mMap.clear();
-//                    try {
-//                        List<Address> addresses = new Geocoder(getContext(), Locale.getDefault())
-//                                .getFromLocationName(newText, 10);
-//                        for (int i = 0; i < addresses.size(); i++) {
-//                            searchAddressList.add(addresses.get(i).getAddressLine(0));
-//                            System.out.println(addresses.get(i));
-//                        }
-//                    } catch (IOException e) {
-//                        e.printStackTrace();
-//                    }
-                }
-//                searchAutoComplete.setAdapter(new ArrayAdapter<>(getActivity(),
-//                        android.R.layout.simple_list_item_1, searchAddressList));
-//                searchAutoComplete.showDropDown();
-                return true;
-            }
-        });
+        searchViewAppBar.setQueryHint(getString(R.string.search_view_hint));
+        searchViewAppBar.setOnQueryTextListener(onQueryTextListener);
     }
 
     private void initAutoComplete() {
-        (searchAutoComplete = (SearchView.SearchAutoComplete) searchViewAppBar
-                .findViewById(R.id.search_src_text))
-                .setOnItemClickListener((parent, view, position, id) -> {
-                    searchViewAppBar.setQuery(searchAddressList.get(position), true);
-                    initMarkerFromName(searchAddressList.get(position));
-                });
+        searchAutoComplete = (SearchView.SearchAutoComplete) searchViewAppBar.findViewById(R.id.search_src_text);
+        searchAutoComplete.setOnItemClickListener((parent, view, position, id) -> {
+            searchViewAppBar.setQuery(searchAddressList.get(position), true);
+            initMarkerFromName(searchAddressList.get(position));
+        });
     }
 
     public void initMarkerFromName(String name) {
-
-        mMap.clear();
+        map.clear();
         try {
             List<Address> addresses = new Geocoder(getContext(), Locale.getDefault())
                     .getFromLocationName(name, 50);
             for (int i = 0; i < addresses.size(); i++) {
-                mMap.addMarker(new MarkerOptions().position(new LatLng(addresses.get(i).getLatitude(),
+                map.addMarker(new MarkerOptions().position(new LatLng(addresses.get(i).getLatitude(),
                         addresses.get(i).getLongitude())).title(addresses.get(i).getAddressLine(0)));
-                mMap.animateCamera(CameraUpdateFactory
-                        .newCameraPosition(
-                                new CameraPosition(
-                                        new LatLng(addresses.get(i).getLatitude(),
-                                                addresses.get(i).getLongitude()), 12f, 0f, 0f)));
+                map.animateCamera(CameraUpdateFactory.newCameraPosition(new CameraPosition(
+                        new LatLng(addresses.get(i).getLatitude(), addresses.get(i).getLongitude()), 12f, 0f, 0f)));
             }
         } catch (IOException e) {
             e.printStackTrace();
@@ -289,15 +249,15 @@ public class MapFragment extends BaseFragment {
 
     @OnClick(R.id.im_btn_profile)
     void imBtnProfile() {
-        new AlertDialog.Builder(getActivity()).setItems(R.array.menu_profile, (dialog, which) -> {
+        new AlertDialog.Builder(getContext()).setItems(R.array.menu_profile, (dialog, which) -> {
             if (which == 0) {
-                ((MainActivity) getActivity()).changeFragment(initFragment());
+                ((MainActivity) getContext()).changeFragment(initFragment());
             } else if (which == 1) {
-                ((MainActivity) getActivity()).changeFragment(RatingFragment.newInstance());
+                ((MainActivity) getContext()).changeFragment(RatingFragment.newInstance());
             } else if (which == 2) {
-                ((MainActivity) getActivity()).changeFragment(OrdersHistoryFragment.newInstance());
+                ((MainActivity) getContext()).changeFragment(OrdersHistoryFragment.newInstance());
             } else if (which == 3) {
-                ((MainActivity) getActivity()).changeFragment(SettingsFragment.newInstance());
+                ((MainActivity) getContext()).changeFragment(SettingsFragment.newInstance());
             }
         }).create().show();
     }
@@ -307,40 +267,38 @@ public class MapFragment extends BaseFragment {
         if (UserModel.User.getUserModel().getIdCurrentOrder() == null) {
             ((MainActivity) getActivity()).changeFragment(CreateOrderFragment.newInstance());
         } else {
-            new AlertDialog.Builder(getActivity())
-                    .setView(initCurrentOrderView())
-                    .setPositiveButton("EDIT", (dialog, which) -> makeToast("edit"))
-                    .setNegativeButton("DELETE", (dialog, which) -> makeToast("delete"))
-                    .setNeutralButton("BACK", (dialog, which) -> dialog.dismiss())
+            new AlertDialog.Builder(getContext())
+                    .setView(super.initCurrentOrderView())
+                    .setPositiveButton(getString(R.string.positive_btn_edit), (dialog, which) -> makeToast("edit"))
+                    .setNegativeButton(getString(R.string.negative_btn_delete), (dialog, which) -> makeToast("delete"))
+                    .setNeutralButton(getString(R.string.neutral_btn_back), (dialog, which) -> dialog.dismiss())
                     .create().show();
         }
     }
 
-
     @OnClick(R.id.fab_my_location)
     void fabMyLocation() {
-        findLocation();
+        getLastLocation();
         try {
-            initMarkerFromLocation(new LatLng(mLocation.getLatitude(), mLocation.getLongitude()));
+            initMarkerFromLocation(new LatLng(location.getLatitude(), location.getLongitude()));
         } catch (Exception e) {
-            Toast.makeText(getContext(), "turn on location", Toast.LENGTH_SHORT).show();
+            Toast.makeText(getContext(), getString(R.string.toast_turn_location), Toast.LENGTH_SHORT).show();
         }
     }
 
     private void initMarkerFromLocation(LatLng latLng) {
-        mMap.animateCamera(CameraUpdateFactory.newCameraPosition(new CameraPosition(latLng, 12f, 0f, 0f)));
-        mMap.clear();
+        map.animateCamera(CameraUpdateFactory.newCameraPosition(new CameraPosition(latLng, 12f, 0f, 0f)));
+        map.clear();
         try {
             List<Address> addresses = new Geocoder(getContext(), Locale.getDefault())
                     .getFromLocation(latLng.latitude, latLng.longitude, 1);
             for (int i = 0; i < addresses.size(); i++) {
-                mMap.addMarker(new MarkerOptions().position(latLng).title(addresses.get(i).getAddressLine(0)));
+                map.addMarker(new MarkerOptions().position(latLng).title(addresses.get(i).getAddressLine(0)));
             }
         } catch (IOException e) {
             e.printStackTrace();
         }
     }
-
 
     private Fragment initFragment() {
         Fragment fragment = SaveProfileFragment.newInstance();
@@ -350,20 +308,7 @@ public class MapFragment extends BaseFragment {
 
     private Bundle initBundle() {
         Bundle bundle = new Bundle();
-        bundle.putBoolean("editMode", true);
+        bundle.putBoolean(EDIT_MODE_KEY, true);
         return bundle;
-    }
-
-    private View initCurrentOrderView() {
-        View view = getActivity().getLayoutInflater().inflate(R.layout.item_current_order, null);
-        ((TextView) ButterKnife.findById(view, R.id.text_from_order))
-                .setText(OrderModel.Order.getOrderModel().getFromOrder());
-        ((TextView) ButterKnife.findById(view, R.id.text_destination_order))
-                .setText(OrderModel.Order.getOrderModel().getDestinationOrder());
-        ((TextView) ButterKnife.findById(view, R.id.text_price_order))
-                .setText(String.valueOf(OrderModel.Order.getOrderModel().getPriceOrder()));
-        ((TextView) ButterKnife.findById(view, R.id.text_comment_order))
-                .setText(OrderModel.Order.getOrderModel().getCommentOrder());
-        return view;
     }
 }

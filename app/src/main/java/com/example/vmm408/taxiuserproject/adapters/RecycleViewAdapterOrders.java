@@ -52,11 +52,9 @@ public class RecycleViewAdapterOrders extends
         TextView itemTextTime;
         @BindView(R.id.item_btn_more)
         TextView itemBtnMore;
-//        private View itemView;
 
         CustomViewHolder(View itemView) {
             super(itemView);
-//            this.itemView = itemView;
             ButterKnife.bind(this, itemView);
         }
     }

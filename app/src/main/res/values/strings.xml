@@ -1,8 +1,38 @@
 <resources>
     <string name="app_name">TaxiUserProject</string>
 
+    // BaseFragment
+    <string name="text_error_empty_fields">can\'t be empty fields</string>
+    <string name="text_error_phone_format">wrong phone format</string>
 
-    // fragment_save_data
+
+    // SignInFragment
+    <string name="progress_dialog_msg">Authenticating…</string>
+
+
+    // MapFragment
+    <string name="search_view_hint">Search here…</string>
+    <string name="positive_btn_edit">EDIT</string>
+    <string name="negative_btn_delete">DELETE</string>
+    <string name="neutral_btn_back">BACK</string>
+    <string name="toast_turn_location">turn on location</string>
+
+
+    // SettingsFragment
+    <string name="alert_title_confirm_sign_out">Confirm signOut</string>
+    <string name="positive_btn_confirm">CONFIRM</string>
+    <string name="negative_btn_cancel">CANCEL</string>
+
+
+    // item_menu_new_avatar
+    <array name="menu_new_avatar">
+        <item>Camera</item>
+        <item>File</item>
+        <item>Delete</item>
+    </array>
+
+
+    // fragment_save_profile
     <string name="hint_full_name">Full Name</string>
     <string name="hint_phone">Phone</string>
     <array name="gender">
@@ -12,14 +42,6 @@
     <string name="hint_birthday">BirthDay</string>
     <string name="btn_save">Save</string>
     <string name="btn_cancel">Cancel</string>
-
-
-    // item_menu_new_avatar
-    <array name="menu_new_avatar">
-        <item>Camera</item>
-        <item>File</item>
-        <item>Delete</item>
-    </array>
 
 
     // fragment_create_order
@@ -72,11 +94,6 @@
 
     <item name="visible" type="id" />
     <item name="masked" type="id" />
-
-
-
-
-
 
 
 </resources>

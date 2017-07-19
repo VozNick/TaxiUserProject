@@ -1,6 +1,5 @@
 package com.example.vmm408.taxiuserproject.fragments;
 
-import android.content.Context;
 import android.content.Intent;
 import android.os.Bundle;
 import android.support.annotation.Nullable;
@@ -11,9 +10,7 @@ import android.view.ViewGroup;
 
 import com.example.vmm408.taxiuserproject.AuthenticationActivity;
 import com.example.vmm408.taxiuserproject.R;
-import com.google.android.gms.auth.api.Auth;
-import com.google.android.gms.common.api.ResultCallback;
-import com.google.android.gms.common.api.Status;
+import com.example.vmm408.taxiuserproject.utils.Utils;
 
 import butterknife.OnClick;
 
@@ -37,18 +34,15 @@ public class SettingsFragment extends BaseFragment {
 
     @OnClick(R.id.btn_sign_out)
     void btnSignOut() {
-        new AlertDialog.Builder(getActivity())
-                .setTitle("Confirm signOut?")
-                .setPositiveButton("CONFIRM", (dialog, which) -> signOut())
-                .setNegativeButton("CANCEL", (dialog, which) -> dialog.dismiss())
+        new AlertDialog.Builder(getContext())
+                .setTitle(getString(R.string.alert_title_confirm_sign_out))
+                .setPositiveButton(getString(R.string.positive_btn_confirm), (dialog, which) -> signOut())
+                .setNegativeButton(getString(R.string.negative_btn_cancel), (dialog, which) -> dialog.dismiss())
                 .create().show();
     }
 
     private void signOut() {
-//        googleApiClient.disconnect();
-//        googleApiClient.clearDefaultAccountAndReconnect();
-        (getContext().getSharedPreferences("UserProfile", Context.MODE_APPEND)
-                .edit()).remove("userId").apply();
-        startActivity(new Intent(getActivity(), AuthenticationActivity.class));
+        new Utils().deleteFromShared(getContext());
+        startActivity(new Intent(getContext(), AuthenticationActivity.class));
     }
 }

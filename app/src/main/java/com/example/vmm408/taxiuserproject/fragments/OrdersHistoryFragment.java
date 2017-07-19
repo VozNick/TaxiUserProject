@@ -11,22 +11,21 @@ import android.view.ViewGroup;
 import android.widget.LinearLayout;
 import android.widget.TextView;
 
+import com.example.vmm408.taxiuserproject.CustomValueEventListener;
 import com.example.vmm408.taxiuserproject.R;
 import com.example.vmm408.taxiuserproject.adapters.EndlessScrollListener;
 import com.example.vmm408.taxiuserproject.adapters.RecycleViewAdapterOrders;
-import com.example.vmm408.taxiuserproject.adapters.RecycleViewAdapterRating;
 import com.example.vmm408.taxiuserproject.models.OrderModel;
-import com.example.vmm408.taxiuserproject.models.RatingModel;
 import com.example.vmm408.taxiuserproject.models.UserModel;
 import com.google.firebase.database.DataSnapshot;
-import com.google.firebase.database.DatabaseError;
-import com.google.firebase.database.ValueEventListener;
+import com.google.firebase.database.Query;
 
 import java.util.ArrayList;
 import java.util.List;
 
 import butterknife.BindView;
-import butterknife.ButterKnife;
+
+import static com.example.vmm408.taxiuserproject.FirebaseDataBaseKeys.ORDERS_REF_KEY;
 
 public class OrdersHistoryFragment extends BaseFragment {
     public static OrdersHistoryFragment newInstance() {
@@ -50,7 +49,9 @@ public class OrdersHistoryFragment extends BaseFragment {
 
     @Nullable
     @Override
-    public View onCreateView(LayoutInflater inflater, @Nullable ViewGroup container, @Nullable Bundle savedInstanceState) {
+    public View onCreateView(LayoutInflater inflater,
+                             @Nullable ViewGroup container,
+                             @Nullable Bundle savedInstanceState) {
         return inflater.inflate(R.layout.fragment_orders_history, container, false);
     }
 
@@ -59,54 +60,32 @@ public class OrdersHistoryFragment extends BaseFragment {
         super.onViewCreated(view, savedInstanceState);
         if (UserModel.User.getUserModel().getIdCurrentOrder() != null) {
             textCurrentOrder.setVisibility(View.VISIBLE);
-            currentOrderContainer.addView(initCurrentOrderView());
+            currentOrderContainer.addView(super.initCurrentOrderView());
         }
         initRecycleView();
         loadMore(0);
     }
 
-    private View initCurrentOrderView() {
-        View view = getActivity().getLayoutInflater().inflate(R.layout.item_current_order, null);
-        ((TextView) ButterKnife.findById(view, R.id.text_from_order))
-                .setText(OrderModel.Order.getOrderModel().getFromOrder());
-        ((TextView) ButterKnife.findById(view, R.id.text_destination_order))
-                .setText(OrderModel.Order.getOrderModel().getDestinationOrder());
-        ((TextView) ButterKnife.findById(view, R.id.text_price_order))
-                .setText(String.valueOf(OrderModel.Order.getOrderModel().getPriceOrder()));
-        ((TextView) ButterKnife.findById(view, R.id.text_comment_order))
-                .setText(OrderModel.Order.getOrderModel().getCommentOrder());
-        return view;
-    }
-
     private void initRecycleView() {
         historyOrderContainer.setLayoutManager(linearLayoutManager);
         historyOrderContainer.setAdapter(recycleViewAdapter = new RecycleViewAdapterOrders());
-        historyOrderContainer.addItemDecoration(new DividerItemDecoration(getActivity(), LinearLayoutManager.VERTICAL));
+        historyOrderContainer.addItemDecoration(new DividerItemDecoration(getContext(), LinearLayoutManager.VERTICAL));
         historyOrderContainer.addOnScrollListener(endlessScrollListener);
     }
 
     private void loadMore(int offset) {
         List<OrderModel> tempList = new ArrayList<>();
-        for (int i = 10 * offset; i < (10 * offset) + 10; i++) {
-            (mReference = mDatabase.getReference("orders"))
-                    .orderByValue()
-                    .equalTo(UserModel.User.getUserModel().getIdUser())
-                    .equalTo("false", "orderAccepted")
-                    .addValueEventListener(new ValueEventListener() {
-                        @Override
-                        public void onDataChange(DataSnapshot dataSnapshot) {
-                            for (DataSnapshot snapshot : dataSnapshot.getChildren()) {
-                                System.out.println(snapshot);
-                                tempList.add(dataSnapshot.getValue(OrderModel.class));
-                            }
-                        }
-
-                        @Override
-                        public void onCancelled(DatabaseError databaseError) {
-
-                        }
-                    });
-        }
-        recycleViewAdapter.addList(tempList);
+        reference = database.getReference(ORDERS_REF_KEY).child(UserModel.User.getUserModel().getIdUser());
+        Query query = reference.startAt(null, String.valueOf(10 * offset)).limitToFirst(10);
+        query.addValueEventListener(new CustomValueEventListener() {
+            @Override
+            public void onDataChange(DataSnapshot dataSnapshot) {
+                System.out.println(dataSnapshot);
+                for (DataSnapshot snapshot : dataSnapshot.getChildren()) {
+                    tempList.add(snapshot.getValue(OrderModel.class));
+                }
+                recycleViewAdapter.addList(tempList);
+            }
+        });
     }
 }

@@ -9,14 +9,13 @@ import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
 
+import com.example.vmm408.taxiuserproject.CustomValueEventListener;
 import com.example.vmm408.taxiuserproject.R;
 import com.example.vmm408.taxiuserproject.adapters.EndlessScrollListener;
 import com.example.vmm408.taxiuserproject.adapters.RecycleViewAdapterRating;
 import com.example.vmm408.taxiuserproject.models.RatingModel;
 import com.example.vmm408.taxiuserproject.models.UserModel;
 import com.google.firebase.database.DataSnapshot;
-import com.google.firebase.database.DatabaseError;
-import com.google.firebase.database.ValueEventListener;
 
 import java.util.ArrayList;
 import java.util.List;
@@ -78,16 +77,11 @@ public class RatingFragment extends BaseFragment {
         List<RatingModel> tempList = new ArrayList<>();
         for (int i = 10 * offset; i < (10 * offset) + 10; i++) {
             tempList.add(ratingModels.get(i));
-            (mReference = mDatabase.getReference("ratings"))
+            (reference = database.getReference("ratings"))
                     .equalTo(UserModel.User.getUserModel().getIdUser())
-                    .addValueEventListener(new ValueEventListener() {
+                    .addValueEventListener(new CustomValueEventListener() {
                         @Override
                         public void onDataChange(DataSnapshot dataSnapshot) {
-
-                        }
-
-                        @Override
-                        public void onCancelled(DatabaseError databaseError) {
 
                         }
                     });

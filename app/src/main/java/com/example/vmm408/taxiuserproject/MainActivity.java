@@ -17,8 +17,6 @@ import butterknife.BindView;
 import butterknife.ButterKnife;
 
 public class MainActivity extends AppCompatActivity {
-//    @BindView(R.id.toolbar)
-//    Toolbar toolbar;
     @BindView(R.id.activity_main_container)
     LinearLayout activityMainContainer;
     private Fragment fragment;
@@ -28,9 +26,6 @@ public class MainActivity extends AppCompatActivity {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_main);
         ButterKnife.bind(this);
-//        setSupportActionBar(toolbar);
-//        getSupportActionBar().setDisplayShowHomeEnabled(true);
-
         startService(new Intent(this, TaxiService.class));
         changeFragment(MapFragment.newInstance());
     }

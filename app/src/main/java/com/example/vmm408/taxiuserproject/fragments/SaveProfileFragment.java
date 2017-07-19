@@ -8,9 +8,11 @@ import android.database.Cursor;
 import android.graphics.Bitmap;
 import android.graphics.BitmapFactory;
 import android.net.Uri;
+import android.os.Build;
 import android.os.Bundle;
 import android.provider.MediaStore;
 import android.support.annotation.Nullable;
+import android.support.annotation.RequiresApi;
 import android.support.v4.app.ActivityCompat;
 import android.support.v7.app.AlertDialog;
 import android.util.Base64;
@@ -26,10 +28,10 @@ import com.bumptech.glide.Glide;
 import com.example.vmm408.taxiuserproject.MainActivity;
 import com.example.vmm408.taxiuserproject.R;
 import com.example.vmm408.taxiuserproject.models.UserModel;
+import com.example.vmm408.taxiuserproject.utils.Utils;
 
 import java.io.ByteArrayOutputStream;
 import java.io.File;
-import java.io.IOException;
 import java.util.Calendar;
 
 import butterknife.BindView;
@@ -37,14 +39,17 @@ import butterknife.OnClick;
 import de.hdodenhof.circleimageview.CircleImageView;
 import id.zelory.compressor.Compressor;
 
+import static com.example.vmm408.taxiuserproject.FirebaseDataBaseKeys.USERS_REF_KEY;
+
 public class SaveProfileFragment extends BaseFragment {
     public static SaveProfileFragment newInstance() {
         return new SaveProfileFragment();
     }
 
     private static final int READ_STORAGE_KEY = 111;
-    private static final int IMAGE_CAPTURE_KEY = 112;
-    private static final int PICK_PHOTO_KEY = 113;
+    private static final int IMAGE_CAPTURE_KEY = 0;
+    private static final int PICK_PHOTO_KEY = 1;
+    private static final int DELETE_PHOTO_KEY = 2;
     @BindView(R.id.image_user_avatar)
     CircleImageView imageUserAvatar;
     @BindView(R.id.edit_text_full_name)
@@ -69,23 +74,26 @@ public class SaveProfileFragment extends BaseFragment {
         return inflater.inflate(R.layout.fragment_save_profile, container, false);
     }
 
+    @RequiresApi(api = Build.VERSION_CODES.JELLY_BEAN)
     @Override
     public void onViewCreated(View view, @Nullable Bundle savedInstanceState) {
         super.onViewCreated(view, savedInstanceState);
         fillDataToWidgets();
-        if (!selfPermissionGranted()) requestPermissions();
+        if (!selfPermissionGranted()) {
+            requestPermissions();
+        }
     }
 
     private void fillDataToWidgets() {
         Bundle bundle = getArguments();
-        if (bundle.getBoolean("editMode")) {
+        if (bundle.getBoolean(EDIT_MODE_KEY)) {
             fillWidgetsFromEditMode();
             return;
         }
-        userId = bundle.getString("userId");
-        googlePhotoPath = bundle.getString("photo");
-        downloadPhotoUri(bundle.getString("photo"));
-        etFullName.setText(bundle.getString("fullName"));
+        userId = bundle.getString(USER_ID_KEY);
+        googlePhotoPath = bundle.getString(PHOTO_KEY);
+        downloadPhotoUri(bundle.getString(PHOTO_KEY));
+        etFullName.setText(bundle.getString(FULL_NAME_KEY));
     }
 
     private void fillWidgetsFromEditMode() {
@@ -102,8 +110,8 @@ public class SaveProfileFragment extends BaseFragment {
         if (avatar == null) {
             imageUserAvatar.setImageResource(R.mipmap.ic_launcher);
         } else if (avatar.startsWith("https://lh3.googleusercontent.com/")) {
-            downloadPhotoUri(avatar);
             googlePhotoPath = avatar;
+            downloadPhotoUri(avatar);
         } else {
             byte[] imageBytes = Base64.decode(UserModel.User.getUserModel().getAvatarUser(), Base64.DEFAULT);
             bitmapAvatar = BitmapFactory.decodeByteArray(imageBytes, 0, imageBytes.length);
@@ -115,11 +123,13 @@ public class SaveProfileFragment extends BaseFragment {
         Glide.with(getActivity()).load(uri).into(imageUserAvatar);
     }
 
+    @RequiresApi(api = Build.VERSION_CODES.JELLY_BEAN)
     private boolean selfPermissionGranted() {
         return ActivityCompat.checkSelfPermission(getContext(),
                 Manifest.permission.READ_EXTERNAL_STORAGE) == PackageManager.PERMISSION_GRANTED;
     }
 
+    @RequiresApi(api = Build.VERSION_CODES.JELLY_BEAN)
     private void requestPermissions() {
         ActivityCompat.requestPermissions(getActivity(),
                 new String[]{Manifest.permission.READ_EXTERNAL_STORAGE},
@@ -129,12 +139,12 @@ public class SaveProfileFragment extends BaseFragment {
     @OnClick(R.id.image_user_avatar)
     public void avatarUser() {
         new AlertDialog.Builder(getActivity()).setItems(R.array.menu_new_avatar, (dialog, which) -> {
-            if (which == 0) {
+            if (which == IMAGE_CAPTURE_KEY) {
                 initActivityResult(IMAGE_CAPTURE_KEY);
-            } else if (which == 1) {
+            } else if (which == PICK_PHOTO_KEY) {
                 initActivityResult(PICK_PHOTO_KEY);
-            } else if (which == 2) {
-                initActivityResult(0);
+            } else if (which == DELETE_PHOTO_KEY) {
+                initActivityResult(DELETE_PHOTO_KEY);
             }
         }).create().show();
     }
@@ -169,23 +179,28 @@ public class SaveProfileFragment extends BaseFragment {
     @Override
     public void onActivityResult(int requestCode, int resultCode, Intent data) {
         super.onActivityResult(requestCode, resultCode, data);
-        if (data == null) return;
+        if (data == null) {
+            return;
+        }
         if (requestCode == IMAGE_CAPTURE_KEY) {
             bitmapAvatar = (Bitmap) data.getExtras().get("data");
         } else if (requestCode == PICK_PHOTO_KEY) {
             bitmapAvatar = new Compressor(getActivity()).compressToBitmap(new File(getPathFromURI(data.getData())));
+        } else if (requestCode == DELETE_PHOTO_KEY) {
+            imageUserAvatar.setImageBitmap(bitmapAvatar);
+            googlePhotoPath = null;
         }
-        imageUserAvatar.setImageBitmap(bitmapAvatar);
-        googlePhotoPath = null;
     }
 
     public String getPathFromURI(Uri uri) {
         Cursor cursor = null;
         try {
             cursor = getActivity().getContentResolver().query(uri, new String[]{"_data"}, null, null, null);
-            if (cursor != null && cursor.moveToFirst()) return cursor.getString(cursor.getColumnIndexOrThrow("_data"));
+            if (cursor != null && cursor.moveToFirst())
+                return cursor.getString(cursor.getColumnIndexOrThrow("_data"));
         } finally {
-            if (cursor != null) cursor.close();
+            if (cursor != null)
+                cursor.close();
         }
         return null;
     }
@@ -193,8 +208,9 @@ public class SaveProfileFragment extends BaseFragment {
     @OnClick(R.id.btn_save_profile)
     void btnSaveProfile() {
         if (super.validate(etFullName) && super.validate(etPhone)) {
-            (mReference = mDatabase.getReference("users")).child(userId).setValue(initUserData());
-            super.saveToShared(userId);
+            reference = database.getReference(USERS_REF_KEY).child(userId);
+            reference.setValue(initUserData());
+            new Utils().saveToShared(getContext(), userId);
             startActivity(new Intent(getActivity(), MainActivity.class));
         }
     }
@@ -214,9 +230,8 @@ public class SaveProfileFragment extends BaseFragment {
             ByteArrayOutputStream baos = new ByteArrayOutputStream();
             bitmapAvatar.compress(Bitmap.CompressFormat.JPEG, 80, baos);
             return Base64.encodeToString(baos.toByteArray(), Base64.DEFAULT);
-        } else {
-            return null;
         }
+        return null;
     }
 
     @OnClick(R.id.btn_cancel_profile)

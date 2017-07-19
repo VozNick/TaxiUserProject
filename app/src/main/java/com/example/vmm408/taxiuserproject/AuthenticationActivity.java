@@ -11,11 +11,8 @@ import butterknife.BindView;
 import butterknife.ButterKnife;
 
 public class AuthenticationActivity extends AppCompatActivity {
-
-
     @BindView(R.id.activity_authentication_container)
     LinearLayout activityAuthContainer;
-    private Fragment fragment;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -25,15 +22,7 @@ public class AuthenticationActivity extends AppCompatActivity {
         changeFragment(SignInFragment.newInstance());
     }
 
-    @Override
-    public void onBackPressed() {
-        if (fragment instanceof SignInFragment) {
-            moveTaskToBack(true);
-        }
-    }
-
     public void changeFragment(Fragment fragment) {
-        this.fragment = fragment;
         getSupportFragmentManager().beginTransaction()
                 .replace(activityAuthContainer.getId(), fragment).commit();
     }

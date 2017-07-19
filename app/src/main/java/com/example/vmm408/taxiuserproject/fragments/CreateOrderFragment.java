@@ -15,6 +15,10 @@ import com.example.vmm408.taxiuserproject.models.UserModel;
 import butterknife.BindView;
 import butterknife.OnClick;
 
+import static com.example.vmm408.taxiuserproject.FirebaseDataBaseKeys.ID_CURRENT_ORDER_CHILD_KEY;
+import static com.example.vmm408.taxiuserproject.FirebaseDataBaseKeys.ORDERS_REF_KEY;
+import static com.example.vmm408.taxiuserproject.FirebaseDataBaseKeys.USERS_REF_KEY;
+
 public class CreateOrderFragment extends BaseFragment {
     public static CreateOrderFragment newInstance() {
         return new CreateOrderFragment();
@@ -51,7 +55,8 @@ public class CreateOrderFragment extends BaseFragment {
     @OnClick(R.id.btn_create_order)
     void btnCreateOrder() {
         if (super.validate(etOrderFrom) && super.validate(etOrderDestination) && super.validate(etOrderPrice)) {
-            currentOrderKey = (mReference = mDatabase.getReference("orders")).push().getKey();
+            reference = database.getReference(ORDERS_REF_KEY).child(UserModel.User.getUserModel().getIdUser());
+            currentOrderKey = reference.push().getKey();
             UserModel.User.getUserModel().setIdCurrentOrder(currentOrderKey);
             saveDataToBase();
             ((MainActivity) getActivity()).changeFragment(MapFragment.newInstance());
@@ -59,11 +64,10 @@ public class CreateOrderFragment extends BaseFragment {
     }
 
     private void saveDataToBase() {
-        mReference.child(currentOrderKey).setValue(initOrder());
-        (mReference = mDatabase.getReference("users"))
-                .child(UserModel.User.getUserModel().getIdUser())
-                .child("idCurrentOrder")
-                .setValue(currentOrderKey);
+        reference.child(currentOrderKey).setValue(initOrder());
+        reference = database.getReference(USERS_REF_KEY)
+                .child(UserModel.User.getUserModel().getIdUser()).child(ID_CURRENT_ORDER_CHILD_KEY);
+        reference.setValue(currentOrderKey);
     }
 
     private OrderModel initOrder() {
