@@ -15,6 +15,8 @@ import com.example.vmm408.taxiuserproject.models.OrderModel;
 import com.google.android.gms.common.api.GoogleApiClient;
 import com.google.firebase.database.DatabaseReference;
 import com.google.firebase.database.FirebaseDatabase;
+import com.google.gson.Gson;
+import com.google.gson.GsonBuilder;
 
 import butterknife.ButterKnife;
 import butterknife.Unbinder;
@@ -28,6 +30,7 @@ public class BaseFragment extends Fragment {
     private Unbinder unbinder;
     protected FirebaseDatabase database;
     protected DatabaseReference reference;
+    protected Gson gson = new GsonBuilder().create();
     protected ProgressDialog progressDialog;
     protected GoogleApiClient googleApiClient;
 
@@ -47,7 +50,7 @@ public class BaseFragment extends Fragment {
     protected boolean validate(EditText editText) {
         String data = editText.getText().toString();
         if (data.isEmpty()) {
-            editText.setError(getString(R.string.text_error_empty_fields));
+            editText.setError(getResources().getString(R.string.text_error_empty_fields));
             return false;
         }
         if (editText.getId() == R.id.edit_text_phone && !Patterns.PHONE.matcher(data).matches()) {

@@ -1,16 +1,13 @@
-package com.example.vmm408.taxiuserproject;
+package com.example.vmm408.taxiuserproject.activities;
 
 import android.content.Intent;
 import android.os.Bundle;
 import android.support.v4.app.Fragment;
 import android.support.v7.app.AppCompatActivity;
-import android.support.v7.widget.Toolbar;
-import android.view.Menu;
-import android.view.MenuItem;
 import android.widget.LinearLayout;
 
+import com.example.vmm408.taxiuserproject.R;
 import com.example.vmm408.taxiuserproject.fragments.MapFragment;
-import com.example.vmm408.taxiuserproject.fragments.SignInFragment;
 import com.example.vmm408.taxiuserproject.service.TaxiService;
 
 import butterknife.BindView;
@@ -26,8 +23,8 @@ public class MainActivity extends AppCompatActivity {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_main);
         ButterKnife.bind(this);
-        startService(new Intent(this, TaxiService.class));
-        changeFragment(MapFragment.newInstance());
+//        startService(new Intent(this, TaxiService.class));
+        changeFragment(new MapFragment());
     }
 
     @Override
@@ -35,7 +32,7 @@ public class MainActivity extends AppCompatActivity {
         if (fragment instanceof MapFragment) {
             moveTaskToBack(true);
         } else {
-            changeFragment(MapFragment.newInstance());
+            changeFragment(new MapFragment());
         }
     }
 
@@ -44,5 +41,4 @@ public class MainActivity extends AppCompatActivity {
         getSupportFragmentManager().beginTransaction()
                 .replace(activityMainContainer.getId(), fragment).commit();
     }
-
 }

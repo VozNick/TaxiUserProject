@@ -7,23 +7,22 @@ import android.view.View;
 import android.view.ViewGroup;
 import android.widget.EditText;
 
-import com.example.vmm408.taxiuserproject.MainActivity;
+import com.example.vmm408.taxiuserproject.activities.MainActivity;
 import com.example.vmm408.taxiuserproject.R;
 import com.example.vmm408.taxiuserproject.models.OrderModel;
 import com.example.vmm408.taxiuserproject.models.UserModel;
 
+import java.util.Calendar;
+
 import butterknife.BindView;
 import butterknife.OnClick;
 
+import static com.example.vmm408.taxiuserproject.FirebaseDataBaseKeys.CURRENT_ORDER_REF_KEY;
 import static com.example.vmm408.taxiuserproject.FirebaseDataBaseKeys.ID_CURRENT_ORDER_CHILD_KEY;
 import static com.example.vmm408.taxiuserproject.FirebaseDataBaseKeys.ORDERS_REF_KEY;
 import static com.example.vmm408.taxiuserproject.FirebaseDataBaseKeys.USERS_REF_KEY;
 
 public class CreateOrderFragment extends BaseFragment {
-    public static CreateOrderFragment newInstance() {
-        return new CreateOrderFragment();
-    }
-
     @BindView(R.id.edit_text_order_from)
     EditText etOrderFrom;
     @BindView(R.id.edit_text_order_destination)
@@ -32,7 +31,6 @@ public class CreateOrderFragment extends BaseFragment {
     EditText etOrderPrice;
     @BindView(R.id.edit_text_order_comment)
     EditText etOrderComment;
-    private String currentOrderKey;
 
     @Nullable
     @Override
@@ -49,25 +47,15 @@ public class CreateOrderFragment extends BaseFragment {
 
     @OnClick(R.id.im_btn_my_location)
     void imBtnMyLocation() {
-
     }
 
     @OnClick(R.id.btn_create_order)
     void btnCreateOrder() {
         if (super.validate(etOrderFrom) && super.validate(etOrderDestination) && super.validate(etOrderPrice)) {
-            reference = database.getReference(ORDERS_REF_KEY).child(UserModel.User.getUserModel().getIdUser());
-            currentOrderKey = reference.push().getKey();
-            UserModel.User.getUserModel().setIdCurrentOrder(currentOrderKey);
-            saveDataToBase();
-            ((MainActivity) getActivity()).changeFragment(MapFragment.newInstance());
+            reference = database.getReference(CURRENT_ORDER_REF_KEY);
+            reference.child(UserModel.User.getUserModel().getIdUser()).setValue(initOrder());
+            ((MainActivity) getContext()).changeFragment(new MapFragment());
         }
-    }
-
-    private void saveDataToBase() {
-        reference.child(currentOrderKey).setValue(initOrder());
-        reference = database.getReference(USERS_REF_KEY)
-                .child(UserModel.User.getUserModel().getIdUser()).child(ID_CURRENT_ORDER_CHILD_KEY);
-        reference.setValue(currentOrderKey);
     }
 
     private OrderModel initOrder() {
@@ -76,7 +64,7 @@ public class CreateOrderFragment extends BaseFragment {
         OrderModel.Order.getOrderModel().setDestinationOrder(etOrderDestination.getText().toString());
         OrderModel.Order.getOrderModel().setPriceOrder(Integer.parseInt(etOrderPrice.getText().toString()));
         OrderModel.Order.getOrderModel().setCommentOrder(etOrderComment.getText().toString());
-//            OrderModel.Order.getOrderModel().setTimeOrder();
+        OrderModel.Order.getOrderModel().setTimeOrder(String.valueOf(Calendar.getInstance().getTimeInMillis() / 1000));
         OrderModel.Order.getOrderModel().setOrderAccepted(false);
         return OrderModel.Order.getOrderModel();
     }

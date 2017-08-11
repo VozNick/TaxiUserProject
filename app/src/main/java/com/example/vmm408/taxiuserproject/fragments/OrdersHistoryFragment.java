@@ -19,6 +19,7 @@ import com.example.vmm408.taxiuserproject.models.OrderModel;
 import com.example.vmm408.taxiuserproject.models.UserModel;
 import com.google.firebase.database.DataSnapshot;
 import com.google.firebase.database.Query;
+import com.google.firebase.database.ValueEventListener;
 
 import java.util.ArrayList;
 import java.util.List;
@@ -28,22 +29,28 @@ import butterknife.BindView;
 import static com.example.vmm408.taxiuserproject.FirebaseDataBaseKeys.ORDERS_REF_KEY;
 
 public class OrdersHistoryFragment extends BaseFragment {
-    public static OrdersHistoryFragment newInstance() {
-        return new OrdersHistoryFragment();
-    }
-
     @BindView(R.id.text_current_order)
     TextView textCurrentOrder;
     @BindView(R.id.current_order_container)
     LinearLayout currentOrderContainer;
     @BindView(R.id.history_order_container)
     RecyclerView historyOrderContainer;
+    List<OrderModel> tempList = new ArrayList<>();
     private RecycleViewAdapterOrders recycleViewAdapter;
     private LinearLayoutManager linearLayoutManager = new LinearLayoutManager(getContext());
     private EndlessScrollListener endlessScrollListener = new EndlessScrollListener(linearLayoutManager) {
         @Override
         public void onLoadMore(int page, int totalItemsCount, RecyclerView view) {
             loadMore(page);
+        }
+    };
+    private ValueEventListener getArchiveOrders = new CustomValueEventListener() {
+        @Override
+        public void onDataChange(DataSnapshot dataSnapshot) {
+            for (DataSnapshot snapshot : dataSnapshot.getChildren()) {
+                tempList.add(snapshot.getValue(OrderModel.class));
+            }
+            recycleViewAdapter.addList(tempList);
         }
     };
 
@@ -58,7 +65,7 @@ public class OrdersHistoryFragment extends BaseFragment {
     @Override
     public void onViewCreated(View view, @Nullable Bundle savedInstanceState) {
         super.onViewCreated(view, savedInstanceState);
-        if (UserModel.User.getUserModel().getIdCurrentOrder() != null) {
+        if (OrderModel.Order.getOrderModel().getFromOrder() != null) {
             textCurrentOrder.setVisibility(View.VISIBLE);
             currentOrderContainer.addView(super.initCurrentOrderView());
         }
@@ -74,18 +81,8 @@ public class OrdersHistoryFragment extends BaseFragment {
     }
 
     private void loadMore(int offset) {
-        List<OrderModel> tempList = new ArrayList<>();
         reference = database.getReference(ORDERS_REF_KEY).child(UserModel.User.getUserModel().getIdUser());
         Query query = reference.startAt(null, String.valueOf(10 * offset)).limitToFirst(10);
-        query.addValueEventListener(new CustomValueEventListener() {
-            @Override
-            public void onDataChange(DataSnapshot dataSnapshot) {
-                System.out.println(dataSnapshot);
-                for (DataSnapshot snapshot : dataSnapshot.getChildren()) {
-                    tempList.add(snapshot.getValue(OrderModel.class));
-                }
-                recycleViewAdapter.addList(tempList);
-            }
-        });
+        query.addValueEventListener(getArchiveOrders);
     }
 }

@@ -4,14 +4,13 @@ import android.app.ProgressDialog;
 import android.content.Intent;
 import android.os.Bundle;
 import android.support.annotation.Nullable;
-import android.support.v4.app.Fragment;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
 
-import com.example.vmm408.taxiuserproject.AuthenticationActivity;
+import com.example.vmm408.taxiuserproject.activities.AuthenticationActivity;
 import com.example.vmm408.taxiuserproject.CustomValueEventListener;
-import com.example.vmm408.taxiuserproject.MainActivity;
+import com.example.vmm408.taxiuserproject.activities.MainActivity;
 import com.example.vmm408.taxiuserproject.R;
 import com.example.vmm408.taxiuserproject.utils.Utils;
 import com.google.android.gms.auth.api.Auth;
@@ -29,27 +28,27 @@ import butterknife.OnClick;
 import static com.example.vmm408.taxiuserproject.FirebaseDataBaseKeys.USERS_REF_KEY;
 
 public class SignInFragment extends BaseFragment {
-    public static SignInFragment newInstance() {
-        return new SignInFragment();
-    }
-
     private static final int SIGN_IN_KEY = 9001;
     @BindView(R.id.sign_in_button)
     SignInButton signInButton;
     private GoogleSignInAccount signInAccount;
-    private GoogleApiClient.OnConnectionFailedListener failedListener = connectionResult -> {
-    };
+    private GoogleApiClient.OnConnectionFailedListener failedListener =
+            connectionResult -> makeToast("connection failed");
     private ValueEventListener getUserFromBase = new CustomValueEventListener() {
         @Override
         public void onDataChange(DataSnapshot dataSnapshot) {
             if (dataSnapshot.hasChildren()) {
-                new Utils().saveToShared(getContext(), dataSnapshot.getKey());
+                Utils.saveUserToShared(getContext(), dataSnapshot.getKey());
                 progressDialog.dismiss();
-                startActivity(new Intent(getActivity(), MainActivity.class));
+                startActivity(new Intent(getContext(), MainActivity.class));
                 return;
             }
             progressDialog.dismiss();
-            ((AuthenticationActivity) getActivity()).changeFragment(initFragment());
+            ((AuthenticationActivity) getContext()).changeFragment(SaveProfileFragment.newInstance(
+                    signInAccount.getId(),
+                    String.valueOf(signInAccount.getPhotoUrl()),
+                    signInAccount.getGivenName() + " " + signInAccount.getFamilyName())
+            );
         }
     };
 
@@ -68,10 +67,11 @@ public class SignInFragment extends BaseFragment {
     }
 
     private GoogleApiClient initUserSingIn() {
-        GoogleSignInOptions signInOptions = new GoogleSignInOptions
-                .Builder(GoogleSignInOptions.DEFAULT_SIGN_IN).build();
-        return new GoogleApiClient.Builder(getContext()).enableAutoManage(getActivity(), failedListener)
-                .addApi(Auth.GOOGLE_SIGN_IN_API, signInOptions).build();
+        return new GoogleApiClient.Builder(getContext())
+                .enableAutoManage(getActivity(), failedListener)
+                .addApi(Auth.GOOGLE_SIGN_IN_API,
+                        new GoogleSignInOptions.Builder(GoogleSignInOptions.DEFAULT_SIGN_IN).build())
+                .build();
     }
 
     @OnClick(R.id.sign_in_button)
@@ -82,7 +82,7 @@ public class SignInFragment extends BaseFragment {
 
     private ProgressDialog initProgressDialog() {
         progressDialog = new ProgressDialog(getContext());
-        progressDialog.setMessage(getString(R.string.progress_dialog_msg));
+        progressDialog.setMessage(getResources().getString(R.string.progress_dialog_msg));
         return progressDialog;
     }
 
@@ -100,19 +100,5 @@ public class SignInFragment extends BaseFragment {
             reference = database.getReference(USERS_REF_KEY).child(signInAccount.getId());
             reference.addListenerForSingleValueEvent(getUserFromBase);
         }
-    }
-
-    private Fragment initFragment() {
-        Fragment fragment = SaveProfileFragment.newInstance();
-        fragment.setArguments(initBundle());
-        return fragment;
-    }
-
-    private Bundle initBundle() {
-        Bundle bundle = new Bundle();
-        bundle.putString(USER_ID_KEY, signInAccount.getId());
-        bundle.putString(PHOTO_KEY, String.valueOf(signInAccount.getPhotoUrl()));
-        bundle.putString(FULL_NAME_KEY, signInAccount.getGivenName() + " " + signInAccount.getFamilyName());
-        return bundle;
     }
 }

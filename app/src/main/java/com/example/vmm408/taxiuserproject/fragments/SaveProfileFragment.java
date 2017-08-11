@@ -25,7 +25,7 @@ import android.widget.Spinner;
 import android.widget.TextView;
 
 import com.bumptech.glide.Glide;
-import com.example.vmm408.taxiuserproject.MainActivity;
+import com.example.vmm408.taxiuserproject.activities.MainActivity;
 import com.example.vmm408.taxiuserproject.R;
 import com.example.vmm408.taxiuserproject.models.UserModel;
 import com.example.vmm408.taxiuserproject.utils.Utils;
@@ -40,10 +40,30 @@ import de.hdodenhof.circleimageview.CircleImageView;
 import id.zelory.compressor.Compressor;
 
 import static com.example.vmm408.taxiuserproject.FirebaseDataBaseKeys.USERS_REF_KEY;
+//import static com.example.vmm408.taxiuserproject.fragments.Keys.DELETE_PHOTO_KEY;
+//import static com.example.vmm408.taxiuserproject.fragments.Keys.IMAGE_CAPTURE_KEY;
+//import static com.example.vmm408.taxiuserproject.fragments.Keys.PICK_PHOTO_KEY;
+//import static com.example.vmm408.taxiuserproject.fragments.Keys.READ_STORAGE_KEY;
 
 public class SaveProfileFragment extends BaseFragment {
-    public static SaveProfileFragment newInstance() {
-        return new SaveProfileFragment();
+    public static SaveProfileFragment newInstance(String userId,
+                                                  String photoUrl,
+                                                  String fullName) {
+        Bundle bundle = new Bundle();
+        bundle.putString(USER_ID_KEY, userId);
+        bundle.putString(PHOTO_KEY, photoUrl);
+        bundle.putString(FULL_NAME_KEY, fullName);
+        SaveProfileFragment fragment = new SaveProfileFragment();
+        fragment.setArguments(bundle);
+        return fragment;
+    }
+
+    public static SaveProfileFragment newInstance(boolean flag) {
+        Bundle bundle = new Bundle();
+        bundle.putBoolean(EDIT_MODE_KEY, flag);
+        SaveProfileFragment fragment = new SaveProfileFragment();
+        fragment.setArguments(bundle);
+        return fragment;
     }
 
     private static final int READ_STORAGE_KEY = 111;
@@ -210,7 +230,7 @@ public class SaveProfileFragment extends BaseFragment {
         if (super.validate(etFullName) && super.validate(etPhone)) {
             reference = database.getReference(USERS_REF_KEY).child(userId);
             reference.setValue(initUserData());
-            new Utils().saveToShared(getContext(), userId);
+            Utils.saveUserToShared(getContext(), userId);
             startActivity(new Intent(getActivity(), MainActivity.class));
         }
     }

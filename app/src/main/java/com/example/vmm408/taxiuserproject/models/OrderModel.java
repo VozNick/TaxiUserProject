@@ -8,7 +8,7 @@ public class OrderModel {
     private String destinationOrder;
     private int priceOrder;
     private String commentOrder;
-    private Date timeOrder;
+    private String timeOrder;
     private boolean orderAccepted;
 
     public void setIdUserOrder(String idUserOrder) {
@@ -51,11 +51,11 @@ public class OrderModel {
         return commentOrder;
     }
 
-    public void setTimeOrder(Date timeOrder) {
+    public void setTimeOrder(String timeOrder) {
         this.timeOrder = timeOrder;
     }
 
-    public Date getTimeOrder() {
+    public String getTimeOrder() {
         return timeOrder;
     }
 
@@ -77,5 +77,18 @@ public class OrderModel {
         public static OrderModel getOrderModel() {
             return orderModel;
         }
+    }
+
+    @Override
+    public String toString() {
+        return "OrderModel{" +
+                "idUserOrder='" + idUserOrder + '\'' +
+                ", fromOrder='" + fromOrder + '\'' +
+                ", destinationOrder='" + destinationOrder + '\'' +
+                ", priceOrder=" + priceOrder +
+                ", commentOrder='" + commentOrder + '\'' +
+                ", timeOrder=" + timeOrder +
+                ", orderAccepted=" + orderAccepted +
+                '}';
     }
 }

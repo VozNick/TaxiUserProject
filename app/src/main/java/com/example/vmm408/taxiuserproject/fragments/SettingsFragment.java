@@ -8,16 +8,16 @@ import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
 
-import com.example.vmm408.taxiuserproject.AuthenticationActivity;
+import com.example.vmm408.taxiuserproject.activities.AuthenticationActivity;
 import com.example.vmm408.taxiuserproject.R;
 import com.example.vmm408.taxiuserproject.utils.Utils;
 
 import butterknife.OnClick;
 
 public class SettingsFragment extends BaseFragment {
-    public static SettingsFragment newInstance() {
-        return new SettingsFragment();
-    }
+//    public static SettingsFragment newInstance() {
+//        return new SettingsFragment();
+//    }
 
     @Nullable
     @Override
@@ -35,14 +35,14 @@ public class SettingsFragment extends BaseFragment {
     @OnClick(R.id.btn_sign_out)
     void btnSignOut() {
         new AlertDialog.Builder(getContext())
-                .setTitle(getString(R.string.alert_title_confirm_sign_out))
-                .setPositiveButton(getString(R.string.positive_btn_confirm), (dialog, which) -> signOut())
-                .setNegativeButton(getString(R.string.negative_btn_cancel), (dialog, which) -> dialog.dismiss())
+                .setTitle(getResources().getString(R.string.alert_title_confirm_sign_out))
+                .setPositiveButton(getResources().getString(R.string.positive_btn_confirm), (dialog, which) -> signOut())
+                .setNegativeButton(getResources().getString(R.string.negative_btn_cancel), (dialog, which) -> dialog.dismiss())
                 .create().show();
     }
 
     private void signOut() {
-        new Utils().deleteFromShared(getContext());
+        Utils.deleteUserFromShared(getContext());
         startActivity(new Intent(getContext(), AuthenticationActivity.class));
     }
 }

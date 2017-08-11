@@ -23,9 +23,9 @@ import java.util.List;
 import butterknife.BindView;
 
 public class RatingFragment extends BaseFragment {
-    public static RatingFragment newInstance() {
-        return new RatingFragment();
-    }
+//    public static RatingFragment newInstance() {
+//        return new RatingFragment();
+//    }
 
     @BindView(R.id.recycler_view_container)
     RecyclerView recyclerViewContainer;
