@@ -23,7 +23,7 @@ public class AuthenticationActivity extends AppCompatActivity {
         setContentView(R.layout.activity_authentication);
         ButterKnife.bind(this);
         if (Utils.userSigned(this) != null) {
-            startActivity(new Intent(this, MainActivity.class));
+            startActivity(new Intent(this, MapActivity.class));
         }
         changeFragment(new SignInFragment());
     }

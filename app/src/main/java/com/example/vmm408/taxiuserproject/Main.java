@@ -20,7 +20,7 @@
 //import android.widget.Toast;
 //
 //import com.example.vmm408.taxiuserproject.BuildConfig;
-//import com.example.vmm408.taxiuserproject.activities.MainActivity;
+//import com.example.vmm408.taxiuserproject.activities.MapActivity;
 //import com.example.vmm408.taxiuserproject.R;
 //import com.google.android.gms.common.api.ApiException;
 //import com.google.android.gms.common.api.ResolvableApiException;
@@ -56,7 +56,7 @@
 //    @Override
 //    public void onCreate(Bundle savedInstanceState) {
 //        super.onCreate(savedInstanceState);
-//        setContentView(R.layout.activity_main);
+//        setContentView(R.layout.activity_map);
 //        requestingLocationUpdates = false;
 //        lastUpdateTime = "";
 //        updateValuesFromBundle(savedInstanceState);
@@ -219,7 +219,7 @@
 //                        @Override
 //                        public void onClick(View view) {
 //                            // Request permission
-//                            ActivityCompat.requestPermissions(MainActivity.this,
+//                            ActivityCompat.requestPermissions(MapActivity.this,
 //                                    new String[]{Manifest.permission.ACCESS_FINE_LOCATION},
 //                                    REQUEST_PERMISSIONS_REQUEST_CODE);
 //                        }
@@ -229,7 +229,7 @@
 //            // Request permission. It's possible this can be auto answered if device policy
 //            // sets the permission in a given state or the user denied the permission
 //            // previously and checked "Never ask again".
-//            ActivityCompat.requestPermissions(MainActivity.this,
+//            ActivityCompat.requestPermissions(MapActivity.this,
 //                    new String[]{Manifest.permission.ACCESS_FINE_LOCATION},
 //                    REQUEST_PERMISSIONS_REQUEST_CODE);
 //        }

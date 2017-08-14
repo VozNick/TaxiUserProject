@@ -35,20 +35,24 @@ public class OrdersHistoryFragment extends BaseFragment {
     LinearLayout currentOrderContainer;
     @BindView(R.id.history_order_container)
     RecyclerView historyOrderContainer;
-    List<OrderModel> tempList = new ArrayList<>();
     private RecycleViewAdapterOrders recycleViewAdapter;
     private LinearLayoutManager linearLayoutManager = new LinearLayoutManager(getContext());
+    private String lastItemFromBase = "0";
     private EndlessScrollListener endlessScrollListener = new EndlessScrollListener(linearLayoutManager) {
         @Override
         public void onLoadMore(int page, int totalItemsCount, RecyclerView view) {
-            loadMore(page);
+            loadMore();
         }
     };
     private ValueEventListener getArchiveOrders = new CustomValueEventListener() {
         @Override
         public void onDataChange(DataSnapshot dataSnapshot) {
+            List<OrderModel> tempList = new ArrayList<>();
             for (DataSnapshot snapshot : dataSnapshot.getChildren()) {
-                tempList.add(snapshot.getValue(OrderModel.class));
+                if (!lastItemFromBase.equals(snapshot.getKey())) {
+                    lastItemFromBase = snapshot.getKey();
+                    tempList.add(snapshot.getValue(OrderModel.class));
+                }
             }
             recycleViewAdapter.addList(tempList);
         }
@@ -70,7 +74,7 @@ public class OrdersHistoryFragment extends BaseFragment {
             currentOrderContainer.addView(super.initCurrentOrderView());
         }
         initRecycleView();
-        loadMore(0);
+        loadMore();
     }
 
     private void initRecycleView() {
@@ -80,9 +84,9 @@ public class OrdersHistoryFragment extends BaseFragment {
         historyOrderContainer.addOnScrollListener(endlessScrollListener);
     }
 
-    private void loadMore(int offset) {
+    private void loadMore() {
         reference = database.getReference(ORDERS_REF_KEY).child(UserModel.User.getUserModel().getIdUser());
-        Query query = reference.startAt(null, String.valueOf(10 * offset)).limitToFirst(10);
-        query.addValueEventListener(getArchiveOrders);
+        Query query = reference.orderByKey().startAt(lastItemFromBase).limitToFirst(5);
+        query.addListenerForSingleValueEvent(getArchiveOrders);
     }
 }

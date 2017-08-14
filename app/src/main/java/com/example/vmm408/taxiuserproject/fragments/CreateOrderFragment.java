@@ -7,8 +7,8 @@ import android.view.View;
 import android.view.ViewGroup;
 import android.widget.EditText;
 
-import com.example.vmm408.taxiuserproject.activities.MainActivity;
 import com.example.vmm408.taxiuserproject.R;
+import com.example.vmm408.taxiuserproject.activities.MapActivity;
 import com.example.vmm408.taxiuserproject.models.OrderModel;
 import com.example.vmm408.taxiuserproject.models.UserModel;
 
@@ -18,9 +18,6 @@ import butterknife.BindView;
 import butterknife.OnClick;
 
 import static com.example.vmm408.taxiuserproject.FirebaseDataBaseKeys.CURRENT_ORDER_REF_KEY;
-import static com.example.vmm408.taxiuserproject.FirebaseDataBaseKeys.ID_CURRENT_ORDER_CHILD_KEY;
-import static com.example.vmm408.taxiuserproject.FirebaseDataBaseKeys.ORDERS_REF_KEY;
-import static com.example.vmm408.taxiuserproject.FirebaseDataBaseKeys.USERS_REF_KEY;
 
 public class CreateOrderFragment extends BaseFragment {
     @BindView(R.id.edit_text_order_from)
@@ -54,7 +51,7 @@ public class CreateOrderFragment extends BaseFragment {
         if (super.validate(etOrderFrom) && super.validate(etOrderDestination) && super.validate(etOrderPrice)) {
             reference = database.getReference(CURRENT_ORDER_REF_KEY);
             reference.child(UserModel.User.getUserModel().getIdUser()).setValue(initOrder());
-            ((MainActivity) getContext()).changeFragment(new MapFragment());
+            ((MapActivity) getContext()).changeFragment(new MapFragment());
         }
     }
 

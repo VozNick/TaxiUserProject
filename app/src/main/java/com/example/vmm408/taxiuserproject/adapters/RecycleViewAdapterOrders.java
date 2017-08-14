@@ -24,6 +24,11 @@ public class RecycleViewAdapterOrders extends
         notifyDataSetChanged();
     }
 
+//    public void addItem(OrderModel orderModel) {
+//        this.orderModelList.add(orderModel);
+//        notifyDataSetChanged();
+//    }
+
     @Override
     public CustomViewHolder onCreateViewHolder(ViewGroup parent, int viewType) {
         return new CustomViewHolder(LayoutInflater.from(parent.getContext())
@@ -34,7 +39,7 @@ public class RecycleViewAdapterOrders extends
     public void onBindViewHolder(CustomViewHolder holder, int position) {
         holder.textFromOrder.setText(orderModelList.get(position).getFromOrder());
         holder.textDestinationOrder.setText(orderModelList.get(position).getDestinationOrder());
-        holder.itemTextTime.setText((CharSequence) orderModelList.get(position).getTimeOrder());
+        holder.itemTextTime.setText(orderModelList.get(position).getTimeOrder());
         holder.itemBtnMore.setOnClickListener(v -> System.out.println("open more fragment"));
     }
 

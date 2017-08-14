@@ -83,12 +83,12 @@
         </android.support.design.widget.TextInputLayout>
 
         <android.support.v7.widget.AppCompatButton
-            android:id="@+id/btn_create_order"
-            android:layout_width="match_parent"
-            android:layout_height="wrap_content"
-            android:layout_marginBottom="@dimen/button_margin_bottom"
-            android:layout_marginTop="@dimen/button_margin_top"
-            android:padding="@dimen/button_padding"
-            android:text="@string/btn_create_order" />
+        android:id="@+id/btn_create_order"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:layout_marginBottom="@dimen/button_margin_bottom"
+        android:layout_marginTop="@dimen/button_margin_top"
+        android:padding="@dimen/button_padding"
+        android:text="@string/btn_create_order" />
     </LinearLayout>
 </ScrollView>

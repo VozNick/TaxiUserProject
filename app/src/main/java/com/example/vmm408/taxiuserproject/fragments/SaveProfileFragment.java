@@ -25,7 +25,7 @@ import android.widget.Spinner;
 import android.widget.TextView;
 
 import com.bumptech.glide.Glide;
-import com.example.vmm408.taxiuserproject.activities.MainActivity;
+import com.example.vmm408.taxiuserproject.activities.MapActivity;
 import com.example.vmm408.taxiuserproject.R;
 import com.example.vmm408.taxiuserproject.models.UserModel;
 import com.example.vmm408.taxiuserproject.utils.Utils;
@@ -231,7 +231,7 @@ public class SaveProfileFragment extends BaseFragment {
             reference = database.getReference(USERS_REF_KEY).child(userId);
             reference.setValue(initUserData());
             Utils.saveUserToShared(getContext(), userId);
-            startActivity(new Intent(getActivity(), MainActivity.class));
+            startActivity(new Intent(getActivity(), MapActivity.class));
         }
     }
 
@@ -257,6 +257,6 @@ public class SaveProfileFragment extends BaseFragment {
     @OnClick(R.id.btn_cancel_profile)
     void btnCancelProfile() {
         btnCancelProfile.setVisibility(View.GONE);
-        startActivity(new Intent(getActivity(), MainActivity.class));
+        startActivity(new Intent(getActivity(), MapActivity.class));
     }
 }

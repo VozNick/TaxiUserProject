@@ -10,7 +10,7 @@ import android.view.ViewGroup;
 
 import com.example.vmm408.taxiuserproject.activities.AuthenticationActivity;
 import com.example.vmm408.taxiuserproject.CustomValueEventListener;
-import com.example.vmm408.taxiuserproject.activities.MainActivity;
+import com.example.vmm408.taxiuserproject.activities.MapActivity;
 import com.example.vmm408.taxiuserproject.R;
 import com.example.vmm408.taxiuserproject.utils.Utils;
 import com.google.android.gms.auth.api.Auth;
@@ -40,7 +40,7 @@ public class SignInFragment extends BaseFragment {
             if (dataSnapshot.hasChildren()) {
                 Utils.saveUserToShared(getContext(), dataSnapshot.getKey());
                 progressDialog.dismiss();
-                startActivity(new Intent(getContext(), MainActivity.class));
+                startActivity(new Intent(getContext(), MapActivity.class));
                 return;
             }
             progressDialog.dismiss();

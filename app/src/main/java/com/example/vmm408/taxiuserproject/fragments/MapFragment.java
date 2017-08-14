@@ -14,18 +14,17 @@ import android.support.v4.app.ActivityCompat;
 import android.support.v7.app.AlertDialog;
 import android.support.v7.widget.SearchView;
 import android.util.Base64;
-import android.util.Log;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
+import android.widget.ArrayAdapter;
 import android.widget.ImageView;
 import android.widget.LinearLayout;
-import android.widget.TextView;
 import android.widget.Toast;
 
 import com.bumptech.glide.Glide;
 import com.example.vmm408.taxiuserproject.CustomValueEventListener;
-import com.example.vmm408.taxiuserproject.activities.MainActivity;
+import com.example.vmm408.taxiuserproject.activities.MapActivity;
 import com.example.vmm408.taxiuserproject.R;
 import com.example.vmm408.taxiuserproject.models.OrderModel;
 import com.example.vmm408.taxiuserproject.models.UserModel;
@@ -47,9 +46,11 @@ import java.util.List;
 import java.util.Locale;
 
 import butterknife.BindView;
-import butterknife.ButterKnife;
 import butterknife.OnClick;
 import de.hdodenhof.circleimageview.CircleImageView;
+import io.reactivex.Observable;
+import io.reactivex.android.schedulers.AndroidSchedulers;
+import io.reactivex.schedulers.Schedulers;
 
 import static com.example.vmm408.taxiuserproject.FirebaseDataBaseKeys.CURRENT_ORDER_REF_KEY;
 import static com.example.vmm408.taxiuserproject.FirebaseDataBaseKeys.ORDERS_REF_KEY;
@@ -73,6 +74,7 @@ public class MapFragment extends BaseFragment {
     private FusedLocationProviderClient client;
     private Location currentLocation;
     private GoogleMap map;
+    private Geocoder geocoder;
     private SearchView.SearchAutoComplete searchAutoComplete;
     private List<String> searchAddressList = new ArrayList<>();
     private ValueEventListener findUserInBase = new CustomValueEventListener() {
@@ -94,32 +96,28 @@ public class MapFragment extends BaseFragment {
         public boolean onQueryTextSubmit(String query) {
             searchViewAppBar.clearFocus();
             initMarkerFromName(query);
-            return true;
+            return false;
         }
 
         @Override
         public boolean onQueryTextChange(String newText) {
             imBtnClearSearch.setVisibility(newText.length() > 0 ? View.VISIBLE : View.GONE);
             if (newText.length() > 2) {
-
-
-                // rx method
-//                    map.clear();
-//                    try {
-//                        List<Address> addresses = new Geocoder(getContext(), Locale.getDefault())
-//                                .getFromLocationName(newText, 10);
-//                        for (int i = 0; i < addresses.size(); i++) {
-//                            searchAddressList.add(addresses.get(i).getAddressLine(0));
-//                            System.out.println(addresses.get(i));
-//                        }
-//                    } catch (IOException e) {
-//                        e.printStackTrace();
-//                    }
+                if (geocoder == null) {
+                    geocoder = new Geocoder(getContext(), Locale.getDefault());
+                }
+                getAddressList(newText).subscribe(addressList -> {
+                            for (int i = 0; i < addressList.size(); i++) {
+                                searchAddressList.add(addressList.get(i).getAddressLine(0));
+                            }
+                            searchAutoComplete.setAdapter(new ArrayAdapter<>(getContext(),
+                                    android.R.layout.simple_list_item_1, searchAddressList));
+                            searchAutoComplete.showDropDown();
+                        },
+                        throwable -> {
+                        });
             }
-//                searchAutoComplete.setAdapter(new ArrayAdapter<>(getActivity(),
-//                        android.R.layout.simple_list_item_1, searchAddressList));
-//                searchAutoComplete.showDropDown();
-            return true;
+            return false;
         }
     };
 
@@ -137,6 +135,7 @@ public class MapFragment extends BaseFragment {
         getUserFromBase();
         initAvatar();
         initMapFragment();
+        initAutoComplete();
         if (!checkSelfPermission()) {
             requestPermissions();
         } else {
@@ -184,6 +183,14 @@ public class MapFragment extends BaseFragment {
         });
     }
 
+    private void initAutoComplete() {
+        searchAutoComplete = (SearchView.SearchAutoComplete) searchViewAppBar.findViewById(R.id.search_src_text);
+        searchAutoComplete.setOnItemClickListener((parent, view, position, id) -> {
+            searchViewAppBar.setQuery(searchAddressList.get(position), true);
+            initMarkerFromName(searchAddressList.get(position));
+        });
+    }
+
     @SuppressWarnings("MissingPermission")
     private void getLastLocation() {
         client = LocationServices.getFusedLocationProviderClient(getContext());
@@ -219,30 +226,6 @@ public class MapFragment extends BaseFragment {
         searchViewAppBar.setOnQueryTextListener(onQueryTextListener);
     }
 
-    private void initAutoComplete() {
-        searchAutoComplete = (SearchView.SearchAutoComplete) searchViewAppBar.findViewById(R.id.search_src_text);
-        searchAutoComplete.setOnItemClickListener((parent, view, position, id) -> {
-            searchViewAppBar.setQuery(searchAddressList.get(position), true);
-            initMarkerFromName(searchAddressList.get(position));
-        });
-    }
-
-    public void initMarkerFromName(String name) {
-        map.clear();
-        try {
-            List<Address> addresses = new Geocoder(getContext(), Locale.getDefault())
-                    .getFromLocationName(name, 50);
-            for (int i = 0; i < addresses.size(); i++) {
-                map.addMarker(new MarkerOptions().position(new LatLng(addresses.get(i).getLatitude(),
-                        addresses.get(i).getLongitude())).title(addresses.get(i).getAddressLine(0)));
-                map.animateCamera(CameraUpdateFactory.newCameraPosition(new CameraPosition(
-                        new LatLng(addresses.get(i).getLatitude(), addresses.get(i).getLongitude()), 12f, 0f, 0f)));
-            }
-        } catch (IOException e) {
-            e.printStackTrace();
-        }
-    }
-
     @OnClick(R.id.image_view_btn_back)
     void imBtnBack() {
         searchViewContainer.setVisibility(View.GONE);
@@ -258,21 +241,29 @@ public class MapFragment extends BaseFragment {
     void imBtnProfile() {
         new AlertDialog.Builder(getContext()).setItems(R.array.menu_profile, (dialog, which) -> {
             if (which == ITEM_PROFILE_KEY) {
-                ((MainActivity) getContext()).changeFragment(SaveProfileFragment.newInstance(true));
+                ((MapActivity) getContext()).changeFragment(SaveProfileFragment.newInstance(true));
             } else if (which == ITEM_RATING_KEY) {
-                ((MainActivity) getContext()).changeFragment(new RatingFragment());
+                ((MapActivity) getContext()).changeFragment(new RatingFragment());
             } else if (which == ITEM_ORDERS_HISTORY_KEY) {
-                ((MainActivity) getContext()).changeFragment(new OrdersHistoryFragment());
+                ((MapActivity) getContext()).changeFragment(new OrdersHistoryFragment());
             } else if (which == ITEM_SETTINGS_KEY) {
-                ((MainActivity) getContext()).changeFragment(new SettingsFragment());
+                ((MapActivity) getContext()).changeFragment(new SettingsFragment());
             }
         }).create().show();
     }
 
+
     @OnClick(R.id.fab_new_order)
     void fabNewOrder() {
+//        View view = getActivity().getLayoutInflater().inflate(R.layout.fragment_create_order, null);
         if (OrderModel.Order.getOrderModel().getFromOrder() == null) {
-            ((MainActivity) getContext()).changeFragment(new CreateOrderFragment());
+            ((MapActivity) getContext()).changeFragment(new CreateOrderFragment());
+//            new AlertDialog.Builder(getContext())
+//                    .setTitle("New Order")
+//                    .setView(view)
+//                    .setCancelable(false)
+//                    .setPositiveButton("SAVE", (dialog, which) -> btnCreateOrder(view))
+//                    .create().show();
         } else {
             new AlertDialog.Builder(getContext())
                     .setView(super.initCurrentOrderView())
@@ -285,6 +276,28 @@ public class MapFragment extends BaseFragment {
                     .create().show();
         }
     }
+
+    // temp for creating
+//    void btnCreateOrder(View view) {
+//        EditText etOrderFrom = ButterKnife.findById(view, R.id.edit_text_order_from);
+//        EditText etOrderDestination = ButterKnife.findById(view, R.id.edit_text_order_destination);
+//        EditText etOrderPrice = ButterKnife.findById(view, R.id.edit_text_order_price);
+//        EditText etOrderComment = ButterKnife.findById(view, R.id.edit_text_order_comment);
+//
+//        if (super.validate(etOrderFrom) && super.validate(etOrderDestination) && super.validate(etOrderPrice)) {
+//
+//            OrderModel.Order.getOrderModel().setIdUserOrder(UserModel.User.getUserModel().getIdUser());
+//            OrderModel.Order.getOrderModel().setFromOrder(etOrderFrom.getText().toString());
+//            OrderModel.Order.getOrderModel().setDestinationOrder(etOrderDestination.getText().toString());
+//            OrderModel.Order.getOrderModel().setPriceOrder(Integer.parseInt(etOrderPrice.getText().toString()));
+//            OrderModel.Order.getOrderModel().setCommentOrder(etOrderComment.getText().toString());
+//            OrderModel.Order.getOrderModel().setTimeOrder(String.valueOf(Calendar.getInstance().getTimeInMillis() / 1000));
+//            OrderModel.Order.getOrderModel().setOrderAccepted(false);
+//
+//            reference = database.getReference(CURRENT_ORDER_REF_KEY);
+//            reference.child(UserModel.User.getUserModel().getIdUser()).setValue(OrderModel.Order.getOrderModel());
+//        }
+//    }
 
     //temp for moving to history
     private void moveToArchive() {
@@ -310,12 +323,50 @@ public class MapFragment extends BaseFragment {
         }
     }
 
+    private void initMarkerFromName(final String address) {
+        map.clear();
+        if (geocoder == null) {
+            geocoder = new Geocoder(getContext(), Locale.getDefault());
+        }
+        getAddressList(address).subscribe(addressList -> {
+            for (int i = 0; i < addressList.size(); i++) {
+                map.addMarker(new MarkerOptions()
+                        .position(new LatLng(
+                                addressList.get(i).getLatitude(), addressList.get(i).getLongitude()))
+                        .title(addressList.get(i).getAddressLine(0)));
+//                        map.animateCamera(CameraUpdateFactory.newCameraPosition(new CameraPosition(
+//                        new LatLng(addressList.get(i).getLatitude(), addressList.get(i).getLongitude()), 12f, 0f, 0f)));
+            }
+
+        }, throwable -> {
+        });
+    }
+
+    private Observable<List<Address>> getAddressList(String newText) {
+        return Observable.just(newText)
+                .map(s -> {
+                    try {
+                        List<Address> addressList = geocoder.getFromLocationName(newText, 10);
+                        if (addressList != null && addressList.size() > 0) {
+                            return addressList;
+                        }
+                    } catch (IOException e) {
+                        e.printStackTrace();
+                    }
+                    return null;
+                })
+                .subscribeOn(Schedulers.io())
+                .observeOn(AndroidSchedulers.mainThread());
+    }
+
     private void initMarkerFromLocation(LatLng latLng) {
         map.animateCamera(CameraUpdateFactory.newCameraPosition(new CameraPosition(latLng, 12f, 0f, 0f)));
         map.clear();
+        if (geocoder == null) {
+            geocoder = new Geocoder(getContext(), Locale.getDefault());
+        }
         try {
-            List<Address> addresses = new Geocoder(getContext(), Locale.getDefault())
-                    .getFromLocation(latLng.latitude, latLng.longitude, 1);
+            List<Address> addresses = geocoder.getFromLocation(latLng.latitude, latLng.longitude, 1);
             for (int i = 0; i < addresses.size(); i++) {
                 map.addMarker(new MarkerOptions().position(latLng).title(addresses.get(i).getAddressLine(0)));
             }
