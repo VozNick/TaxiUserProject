@@ -9,13 +9,10 @@ import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
 
-import com.example.vmm408.taxiuserproject.CustomValueEventListener;
 import com.example.vmm408.taxiuserproject.R;
 import com.example.vmm408.taxiuserproject.adapters.EndlessScrollListener;
-import com.example.vmm408.taxiuserproject.adapters.RecycleViewAdapterRating;
+import com.example.vmm408.taxiuserproject.adapters.RecyclerViewAdapterRating;
 import com.example.vmm408.taxiuserproject.models.RatingModel;
-import com.example.vmm408.taxiuserproject.models.UserModel;
-import com.google.firebase.database.DataSnapshot;
 
 import java.util.ArrayList;
 import java.util.List;
@@ -23,19 +20,19 @@ import java.util.List;
 import butterknife.BindView;
 
 public class RatingFragment extends BaseFragment {
-//    public static RatingFragment newInstance() {
-//        return new RatingFragment();
-//    }
+    public static RatingFragment newInstance() {
+        return new RatingFragment();
+    }
 
-    @BindView(R.id.recycler_view_container)
-    RecyclerView recyclerViewContainer;
+    @BindView(R.id.rating_list)
+    RecyclerView rating_list;
     private List<RatingModel> ratingModels = new ArrayList<>(); // temp
-    private RecycleViewAdapterRating recycleViewAdapter;
+    private RecyclerViewAdapterRating recyclerViewAdapter;
     private LinearLayoutManager linearLayoutManager = new LinearLayoutManager(getContext());
     private EndlessScrollListener endlessScrollListener = new EndlessScrollListener(linearLayoutManager) {
         @Override
-        public void onLoadMore(int page, int totalItemsCount, RecyclerView view) {
-            loadMore(page);
+        public void onLoadMore() {
+            loadMore();
         }
     };
 
@@ -51,8 +48,8 @@ public class RatingFragment extends BaseFragment {
     public void onViewCreated(View view, @Nullable Bundle savedInstanceState) {
         super.onViewCreated(view, savedInstanceState);
         tempArrayList();
-        initRecycleView();
-        loadMore(0);
+        initRecyclerView();
+        loadMore();
     }
 
     // temp
@@ -66,26 +63,26 @@ public class RatingFragment extends BaseFragment {
         }
     }
 
-    private void initRecycleView() {
-        recyclerViewContainer.setLayoutManager(linearLayoutManager);
-        recyclerViewContainer.setAdapter(recycleViewAdapter = new RecycleViewAdapterRating());
-        recyclerViewContainer.addItemDecoration(new DividerItemDecoration(getActivity(), LinearLayoutManager.VERTICAL));
-        recyclerViewContainer.addOnScrollListener(endlessScrollListener);
+    private void initRecyclerView() {
+        rating_list.setLayoutManager(linearLayoutManager);
+        rating_list.setAdapter(recyclerViewAdapter = new RecyclerViewAdapterRating());
+        rating_list.addItemDecoration(new DividerItemDecoration(getActivity(), LinearLayoutManager.VERTICAL));
+        rating_list.addOnScrollListener(endlessScrollListener);
     }
 
-    private void loadMore(int offset) {
-        List<RatingModel> tempList = new ArrayList<>();
-        for (int i = 10 * offset; i < (10 * offset) + 10; i++) {
-            tempList.add(ratingModels.get(i));
-            (reference = database.getReference("ratings"))
-                    .equalTo(UserModel.User.getUserModel().getIdUser())
-                    .addValueEventListener(new CustomValueEventListener() {
-                        @Override
-                        public void onDataChange(DataSnapshot dataSnapshot) {
-
-                        }
-                    });
-        }
-        recycleViewAdapter.addList(tempList);
+    private void loadMore() {
+//        List<RatingModel> tempList = new ArrayList<>();
+//        for (int i = 10 * offset; i < (10 * offset) + 10; i++) {
+//            tempList.add(ratingModels.get(i));
+//            (reference = database.getReference("ratings"))
+//                    .equalTo(UserModel.User.getUserModel().getIdUser())
+//                    .addValueEventListener(new CustomValueEventListener() {
+//                        @Override
+//                        public void onDataChange(DataSnapshot dataSnapshot) {
+//
+//                        }
+//                    });
+//        }
+//        recyclerViewAdapter.addList(tempList);
     }
 }

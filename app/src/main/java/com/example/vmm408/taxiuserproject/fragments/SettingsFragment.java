@@ -1,6 +1,5 @@
 package com.example.vmm408.taxiuserproject.fragments;
 
-import android.content.Intent;
 import android.os.Bundle;
 import android.support.annotation.Nullable;
 import android.support.v7.app.AlertDialog;
@@ -10,14 +9,14 @@ import android.view.ViewGroup;
 
 import com.example.vmm408.taxiuserproject.activities.AuthenticationActivity;
 import com.example.vmm408.taxiuserproject.R;
-import com.example.vmm408.taxiuserproject.utils.Utils;
+import com.example.vmm408.taxiuserproject.utils.UserSharedUtils;
 
 import butterknife.OnClick;
 
 public class SettingsFragment extends BaseFragment {
-//    public static SettingsFragment newInstance() {
-//        return new SettingsFragment();
-//    }
+    public static SettingsFragment newInstance() {
+        return new SettingsFragment();
+    }
 
     @Nullable
     @Override
@@ -38,11 +37,11 @@ public class SettingsFragment extends BaseFragment {
                 .setTitle(getResources().getString(R.string.alert_title_confirm_sign_out))
                 .setPositiveButton(getResources().getString(R.string.positive_btn_confirm), (dialog, which) -> signOut())
                 .setNegativeButton(getResources().getString(R.string.negative_btn_cancel), (dialog, which) -> dialog.dismiss())
-                .create().show();
+                .show();
     }
 
     private void signOut() {
-        Utils.deleteUserFromShared(getContext());
-        startActivity(new Intent(getContext(), AuthenticationActivity.class));
+        UserSharedUtils.deleteUserFromShared(getContext());
+        ((AuthenticationActivity) getContext()).changeFragment(SignInFragment.newInstance());
     }
 }

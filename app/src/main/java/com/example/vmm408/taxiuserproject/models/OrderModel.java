@@ -6,7 +6,7 @@ public class OrderModel {
     private String idUserOrder;
     private String fromOrder;
     private String destinationOrder;
-    private int priceOrder;
+    private String priceOrder;
     private String commentOrder;
     private String timeOrder;
     private boolean orderAccepted;
@@ -35,11 +35,11 @@ public class OrderModel {
         return destinationOrder;
     }
 
-    public void setPriceOrder(int priceOrder) {
+    public void setPriceOrder(String priceOrder) {
         this.priceOrder = priceOrder;
     }
 
-    public int getPriceOrder() {
+    public String getPriceOrder() {
         return priceOrder;
     }
 

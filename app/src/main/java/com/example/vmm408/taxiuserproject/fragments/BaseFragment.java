@@ -22,10 +22,7 @@ import butterknife.ButterKnife;
 import butterknife.Unbinder;
 
 public class BaseFragment extends Fragment {
-    public static final String EDIT_MODE_KEY = "editMode";
-    public static final String USER_ID_KEY = "userId";
-    public static final String PHOTO_KEY = "photo";
-    public static final String FULL_NAME_KEY = "fullName";
+
 
     private Unbinder unbinder;
     protected FirebaseDatabase database;
@@ -61,16 +58,17 @@ public class BaseFragment extends Fragment {
     }
 
     protected View initCurrentOrderView() {
-        View view = getActivity().getLayoutInflater().inflate(R.layout.item_current_order, null);
-        TextView from = ButterKnife.findById(view, R.id.text_from_order);
-        from.setText(OrderModel.Order.getOrderModel().getFromOrder());
-        TextView destination = ButterKnife.findById(view, R.id.text_destination_order);
-        destination.setText(OrderModel.Order.getOrderModel().getDestinationOrder());
-        TextView price = ButterKnife.findById(view, R.id.text_price_order);
-        price.setText(String.valueOf(OrderModel.Order.getOrderModel().getPriceOrder()));
-        TextView comment = ButterKnife.findById(view, R.id.text_comment_order);
-        comment.setText(OrderModel.Order.getOrderModel().getCommentOrder());
-        return view;
+        OrderModel orderModel = OrderModel.Order.getOrderModel();
+        View currentOrderView = getActivity().getLayoutInflater().inflate(R.layout.item_current_order, null);
+        TextView from = ButterKnife.findById(currentOrderView, R.id.text_from_order);
+        from.setText(orderModel.getFromOrder());
+        TextView destination = ButterKnife.findById(currentOrderView, R.id.text_destination_order);
+        destination.setText(orderModel.getDestinationOrder());
+        TextView price = ButterKnife.findById(currentOrderView, R.id.text_price_order);
+        price.setText(orderModel.getPriceOrder());
+        TextView comment = ButterKnife.findById(currentOrderView, R.id.text_comment_order);
+        comment.setText(orderModel.getCommentOrder());
+        return currentOrderView;
     }
 
     protected void makeToast(String string) {

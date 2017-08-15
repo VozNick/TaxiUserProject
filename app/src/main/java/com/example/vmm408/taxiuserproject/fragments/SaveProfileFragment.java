@@ -25,10 +25,11 @@ import android.widget.Spinner;
 import android.widget.TextView;
 
 import com.bumptech.glide.Glide;
-import com.example.vmm408.taxiuserproject.activities.MapActivity;
+import com.example.vmm408.taxiuserproject.MyKeys;
 import com.example.vmm408.taxiuserproject.R;
+import com.example.vmm408.taxiuserproject.activities.AuthenticationActivity;
 import com.example.vmm408.taxiuserproject.models.UserModel;
-import com.example.vmm408.taxiuserproject.utils.Utils;
+import com.example.vmm408.taxiuserproject.utils.UserSharedUtils;
 
 import java.io.ByteArrayOutputStream;
 import java.io.File;
@@ -40,19 +41,15 @@ import de.hdodenhof.circleimageview.CircleImageView;
 import id.zelory.compressor.Compressor;
 
 import static com.example.vmm408.taxiuserproject.FirebaseDataBaseKeys.USERS_REF_KEY;
-//import static com.example.vmm408.taxiuserproject.fragments.Keys.DELETE_PHOTO_KEY;
-//import static com.example.vmm408.taxiuserproject.fragments.Keys.IMAGE_CAPTURE_KEY;
-//import static com.example.vmm408.taxiuserproject.fragments.Keys.PICK_PHOTO_KEY;
-//import static com.example.vmm408.taxiuserproject.fragments.Keys.READ_STORAGE_KEY;
 
 public class SaveProfileFragment extends BaseFragment {
     public static SaveProfileFragment newInstance(String userId,
                                                   String photoUrl,
                                                   String fullName) {
         Bundle bundle = new Bundle();
-        bundle.putString(USER_ID_KEY, userId);
-        bundle.putString(PHOTO_KEY, photoUrl);
-        bundle.putString(FULL_NAME_KEY, fullName);
+        bundle.putString(MyKeys.USER_ID_KEY, userId);
+        bundle.putString(MyKeys.PHOTO_KEY, photoUrl);
+        bundle.putString(MyKeys.FULL_NAME_KEY, fullName);
         SaveProfileFragment fragment = new SaveProfileFragment();
         fragment.setArguments(bundle);
         return fragment;
@@ -60,16 +57,12 @@ public class SaveProfileFragment extends BaseFragment {
 
     public static SaveProfileFragment newInstance(boolean flag) {
         Bundle bundle = new Bundle();
-        bundle.putBoolean(EDIT_MODE_KEY, flag);
+        bundle.putBoolean(MyKeys.EDIT_MODE_KEY, flag);
         SaveProfileFragment fragment = new SaveProfileFragment();
         fragment.setArguments(bundle);
         return fragment;
     }
 
-    private static final int READ_STORAGE_KEY = 111;
-    private static final int IMAGE_CAPTURE_KEY = 0;
-    private static final int PICK_PHOTO_KEY = 1;
-    private static final int DELETE_PHOTO_KEY = 2;
     @BindView(R.id.image_user_avatar)
     CircleImageView imageUserAvatar;
     @BindView(R.id.edit_text_full_name)
@@ -85,6 +78,8 @@ public class SaveProfileFragment extends BaseFragment {
     private String userId;
     private Bitmap bitmapAvatar;
     private String googlePhotoPath;
+
+    private boolean editMode;
 
     @Nullable
     @Override
@@ -104,16 +99,21 @@ public class SaveProfileFragment extends BaseFragment {
         }
     }
 
+    public boolean isEditMode() {
+        return editMode;
+    }
+
     private void fillDataToWidgets() {
         Bundle bundle = getArguments();
-        if (bundle.getBoolean(EDIT_MODE_KEY)) {
+        if (bundle.getBoolean(MyKeys.EDIT_MODE_KEY)) {
+            editMode = bundle.getBoolean(MyKeys.EDIT_MODE_KEY);
             fillWidgetsFromEditMode();
             return;
         }
-        userId = bundle.getString(USER_ID_KEY);
-        googlePhotoPath = bundle.getString(PHOTO_KEY);
-        downloadPhotoUri(bundle.getString(PHOTO_KEY));
-        etFullName.setText(bundle.getString(FULL_NAME_KEY));
+        userId = bundle.getString(MyKeys.USER_ID_KEY);
+        googlePhotoPath = bundle.getString(MyKeys.PHOTO_KEY);
+        downloadPhotoUri(bundle.getString(MyKeys.PHOTO_KEY));
+        etFullName.setText(bundle.getString(MyKeys.FULL_NAME_KEY));
     }
 
     private void fillWidgetsFromEditMode() {
@@ -153,18 +153,18 @@ public class SaveProfileFragment extends BaseFragment {
     private void requestPermissions() {
         ActivityCompat.requestPermissions(getActivity(),
                 new String[]{Manifest.permission.READ_EXTERNAL_STORAGE},
-                READ_STORAGE_KEY);
+                MyKeys.READ_STORAGE_KEY);
     }
 
     @OnClick(R.id.image_user_avatar)
     public void avatarUser() {
         new AlertDialog.Builder(getActivity()).setItems(R.array.menu_new_avatar, (dialog, which) -> {
-            if (which == IMAGE_CAPTURE_KEY) {
-                initActivityResult(IMAGE_CAPTURE_KEY);
-            } else if (which == PICK_PHOTO_KEY) {
-                initActivityResult(PICK_PHOTO_KEY);
-            } else if (which == DELETE_PHOTO_KEY) {
-                initActivityResult(DELETE_PHOTO_KEY);
+            if (which == MyKeys.IMAGE_CAPTURE_KEY) {
+                initActivityResult(MyKeys.IMAGE_CAPTURE_KEY);
+            } else if (which == MyKeys.PICK_PHOTO_KEY) {
+                initActivityResult(MyKeys.PICK_PHOTO_KEY);
+            } else if (which == MyKeys.DELETE_PHOTO_KEY) {
+                initActivityResult(MyKeys.DELETE_PHOTO_KEY);
             }
         }).create().show();
     }
@@ -185,9 +185,9 @@ public class SaveProfileFragment extends BaseFragment {
     }
 
     private void initActivityResult(int key) {
-        if (key == IMAGE_CAPTURE_KEY) {
+        if (key == MyKeys.IMAGE_CAPTURE_KEY) {
             startActivityForResult(new Intent(MediaStore.ACTION_IMAGE_CAPTURE, null), key);
-        } else if (key == PICK_PHOTO_KEY) {
+        } else if (key == MyKeys.PICK_PHOTO_KEY) {
             startActivityForResult(new Intent(Intent.ACTION_PICK, MediaStore.Images.Media.INTERNAL_CONTENT_URI), key);
         } else {
             imageUserAvatar.setImageResource(R.mipmap.ic_launcher);
@@ -202,11 +202,11 @@ public class SaveProfileFragment extends BaseFragment {
         if (data == null) {
             return;
         }
-        if (requestCode == IMAGE_CAPTURE_KEY) {
+        if (requestCode == MyKeys.IMAGE_CAPTURE_KEY) {
             bitmapAvatar = (Bitmap) data.getExtras().get("data");
-        } else if (requestCode == PICK_PHOTO_KEY) {
+        } else if (requestCode == MyKeys.PICK_PHOTO_KEY) {
             bitmapAvatar = new Compressor(getActivity()).compressToBitmap(new File(getPathFromURI(data.getData())));
-        } else if (requestCode == DELETE_PHOTO_KEY) {
+        } else if (requestCode == MyKeys.DELETE_PHOTO_KEY) {
             imageUserAvatar.setImageBitmap(bitmapAvatar);
             googlePhotoPath = null;
         }
@@ -218,10 +218,11 @@ public class SaveProfileFragment extends BaseFragment {
             cursor = getActivity().getContentResolver().query(uri, new String[]{"_data"}, null, null, null);
             if (cursor != null && cursor.moveToFirst())
                 return cursor.getString(cursor.getColumnIndexOrThrow("_data"));
-        } finally {
-            if (cursor != null)
-                cursor.close();
+        } catch (NullPointerException e) {
+            e.printStackTrace();
         }
+        if (cursor != null)
+            cursor.close();
         return null;
     }
 
@@ -230,8 +231,8 @@ public class SaveProfileFragment extends BaseFragment {
         if (super.validate(etFullName) && super.validate(etPhone)) {
             reference = database.getReference(USERS_REF_KEY).child(userId);
             reference.setValue(initUserData());
-            Utils.saveUserToShared(getContext(), userId);
-            startActivity(new Intent(getActivity(), MapActivity.class));
+            UserSharedUtils.saveUserToShared(getContext(), userId);
+            ((AuthenticationActivity) getContext()).changeFragment(MapFragment.newInstance());
         }
     }
 
@@ -257,6 +258,6 @@ public class SaveProfileFragment extends BaseFragment {
     @OnClick(R.id.btn_cancel_profile)
     void btnCancelProfile() {
         btnCancelProfile.setVisibility(View.GONE);
-        startActivity(new Intent(getActivity(), MapActivity.class));
+        ((AuthenticationActivity) getContext()).changeFragment(MapFragment.newInstance());
     }
 }

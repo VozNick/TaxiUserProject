@@ -11,10 +11,9 @@ import android.view.ViewGroup;
 import android.widget.LinearLayout;
 import android.widget.TextView;
 
-import com.example.vmm408.taxiuserproject.CustomValueEventListener;
 import com.example.vmm408.taxiuserproject.R;
 import com.example.vmm408.taxiuserproject.adapters.EndlessScrollListener;
-import com.example.vmm408.taxiuserproject.adapters.RecycleViewAdapterOrders;
+import com.example.vmm408.taxiuserproject.adapters.RecyclerViewAdapterOrders;
 import com.example.vmm408.taxiuserproject.models.OrderModel;
 import com.example.vmm408.taxiuserproject.models.UserModel;
 import com.google.firebase.database.DataSnapshot;
@@ -29,18 +28,22 @@ import butterknife.BindView;
 import static com.example.vmm408.taxiuserproject.FirebaseDataBaseKeys.ORDERS_REF_KEY;
 
 public class OrdersHistoryFragment extends BaseFragment {
+    public static OrdersHistoryFragment newInstance() {
+        return new OrdersHistoryFragment();
+    }
+
     @BindView(R.id.text_current_order)
     TextView textCurrentOrder;
     @BindView(R.id.current_order_container)
     LinearLayout currentOrderContainer;
-    @BindView(R.id.history_order_container)
-    RecyclerView historyOrderContainer;
-    private RecycleViewAdapterOrders recycleViewAdapter;
+    @BindView(R.id.history_order_list)
+    RecyclerView historyOrderList;
+    private RecyclerViewAdapterOrders recyclerViewAdapter;
     private LinearLayoutManager linearLayoutManager = new LinearLayoutManager(getContext());
     private String lastItemFromBase = "0";
     private EndlessScrollListener endlessScrollListener = new EndlessScrollListener(linearLayoutManager) {
         @Override
-        public void onLoadMore(int page, int totalItemsCount, RecyclerView view) {
+        public void onLoadMore() {
             loadMore();
         }
     };
@@ -54,7 +57,7 @@ public class OrdersHistoryFragment extends BaseFragment {
                     tempList.add(snapshot.getValue(OrderModel.class));
                 }
             }
-            recycleViewAdapter.addList(tempList);
+            recyclerViewAdapter.addList(tempList);
         }
     };
 
@@ -73,15 +76,15 @@ public class OrdersHistoryFragment extends BaseFragment {
             textCurrentOrder.setVisibility(View.VISIBLE);
             currentOrderContainer.addView(super.initCurrentOrderView());
         }
-        initRecycleView();
+        initRecyclerView();
         loadMore();
     }
 
-    private void initRecycleView() {
-        historyOrderContainer.setLayoutManager(linearLayoutManager);
-        historyOrderContainer.setAdapter(recycleViewAdapter = new RecycleViewAdapterOrders());
-        historyOrderContainer.addItemDecoration(new DividerItemDecoration(getContext(), LinearLayoutManager.VERTICAL));
-        historyOrderContainer.addOnScrollListener(endlessScrollListener);
+    private void initRecyclerView() {
+        historyOrderList.setLayoutManager(linearLayoutManager);
+        historyOrderList.setAdapter(recyclerViewAdapter = new RecyclerViewAdapterOrders());
+        historyOrderList.addItemDecoration(new DividerItemDecoration(getContext(), LinearLayoutManager.VERTICAL));
+        historyOrderList.addOnScrollListener(endlessScrollListener);
     }
 
     private void loadMore() {

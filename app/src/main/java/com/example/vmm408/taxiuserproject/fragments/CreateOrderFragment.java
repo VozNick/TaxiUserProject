@@ -8,7 +8,7 @@ import android.view.ViewGroup;
 import android.widget.EditText;
 
 import com.example.vmm408.taxiuserproject.R;
-import com.example.vmm408.taxiuserproject.activities.MapActivity;
+import com.example.vmm408.taxiuserproject.activities.AuthenticationActivity;
 import com.example.vmm408.taxiuserproject.models.OrderModel;
 import com.example.vmm408.taxiuserproject.models.UserModel;
 
@@ -20,6 +20,10 @@ import butterknife.OnClick;
 import static com.example.vmm408.taxiuserproject.FirebaseDataBaseKeys.CURRENT_ORDER_REF_KEY;
 
 public class CreateOrderFragment extends BaseFragment {
+    public static CreateOrderFragment newInstance() {
+        return new CreateOrderFragment();
+    }
+
     @BindView(R.id.edit_text_order_from)
     EditText etOrderFrom;
     @BindView(R.id.edit_text_order_destination)
@@ -51,7 +55,7 @@ public class CreateOrderFragment extends BaseFragment {
         if (super.validate(etOrderFrom) && super.validate(etOrderDestination) && super.validate(etOrderPrice)) {
             reference = database.getReference(CURRENT_ORDER_REF_KEY);
             reference.child(UserModel.User.getUserModel().getIdUser()).setValue(initOrder());
-            ((MapActivity) getContext()).changeFragment(new MapFragment());
+            ((AuthenticationActivity) getContext()).changeFragment(MapFragment.newInstance());
         }
     }
 
@@ -59,7 +63,7 @@ public class CreateOrderFragment extends BaseFragment {
         OrderModel.Order.getOrderModel().setIdUserOrder(UserModel.User.getUserModel().getIdUser());
         OrderModel.Order.getOrderModel().setFromOrder(etOrderFrom.getText().toString());
         OrderModel.Order.getOrderModel().setDestinationOrder(etOrderDestination.getText().toString());
-        OrderModel.Order.getOrderModel().setPriceOrder(Integer.parseInt(etOrderPrice.getText().toString()));
+        OrderModel.Order.getOrderModel().setPriceOrder(etOrderPrice.getText().toString());
         OrderModel.Order.getOrderModel().setCommentOrder(etOrderComment.getText().toString());
         OrderModel.Order.getOrderModel().setTimeOrder(String.valueOf(Calendar.getInstance().getTimeInMillis() / 1000));
         OrderModel.Order.getOrderModel().setOrderAccepted(false);

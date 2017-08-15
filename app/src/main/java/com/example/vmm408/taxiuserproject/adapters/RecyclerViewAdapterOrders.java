@@ -1,6 +1,7 @@
 package com.example.vmm408.taxiuserproject.adapters;
 
 import android.support.v7.widget.RecyclerView;
+import android.util.Log;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
@@ -15,19 +16,14 @@ import java.util.List;
 import butterknife.BindView;
 import butterknife.ButterKnife;
 
-public class RecycleViewAdapterOrders extends
-        RecyclerView.Adapter<RecycleViewAdapterOrders.CustomViewHolder> {
+public class RecyclerViewAdapterOrders extends
+        RecyclerView.Adapter<RecyclerViewAdapterOrders.CustomViewHolder> {
     private List<OrderModel> orderModelList = new ArrayList<>();
 
     public void addList(List<OrderModel> orderModelList) {
         this.orderModelList.addAll(orderModelList);
         notifyDataSetChanged();
     }
-
-//    public void addItem(OrderModel orderModel) {
-//        this.orderModelList.add(orderModel);
-//        notifyDataSetChanged();
-//    }
 
     @Override
     public CustomViewHolder onCreateViewHolder(ViewGroup parent, int viewType) {
@@ -40,7 +36,6 @@ public class RecycleViewAdapterOrders extends
         holder.textFromOrder.setText(orderModelList.get(position).getFromOrder());
         holder.textDestinationOrder.setText(orderModelList.get(position).getDestinationOrder());
         holder.itemTextTime.setText(orderModelList.get(position).getTimeOrder());
-        holder.itemBtnMore.setOnClickListener(v -> System.out.println("open more fragment"));
     }
 
     @Override
@@ -48,7 +43,7 @@ public class RecycleViewAdapterOrders extends
         return orderModelList.size();
     }
 
-    class CustomViewHolder extends RecyclerView.ViewHolder {
+    protected class CustomViewHolder extends RecyclerView.ViewHolder {
         @BindView(R.id.text_from_order)
         TextView textFromOrder;
         @BindView(R.id.text_destination_order)
@@ -61,6 +56,7 @@ public class RecycleViewAdapterOrders extends
         CustomViewHolder(View itemView) {
             super(itemView);
             ButterKnife.bind(this, itemView);
+            itemView.setOnClickListener(v -> Log.d("TAG", orderModelList.get(getAdapterPosition()).toString()));
         }
     }
 }

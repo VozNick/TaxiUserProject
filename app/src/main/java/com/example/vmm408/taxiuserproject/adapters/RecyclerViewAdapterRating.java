@@ -1,6 +1,7 @@
 package com.example.vmm408.taxiuserproject.adapters;
 
 import android.support.v7.widget.RecyclerView;
+import android.util.Log;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
@@ -16,8 +17,8 @@ import java.util.List;
 import butterknife.BindView;
 import butterknife.ButterKnife;
 
-public class RecycleViewAdapterRating extends
-        RecyclerView.Adapter<RecycleViewAdapterRating.CustomViewHolder> {
+public class RecyclerViewAdapterRating extends
+        RecyclerView.Adapter<RecyclerViewAdapterRating.CustomViewHolder> {
     private List<RatingModel> ratingModelList = new ArrayList<>();
 
     public void addList(List<RatingModel> ratingModelList) {
@@ -36,7 +37,6 @@ public class RecycleViewAdapterRating extends
         holder.itemImageAvatar.setImageResource(R.mipmap.ic_launcher);
         holder.itemTextTitle.setText(ratingModelList.get(position).getIdUserRating());
         holder.itemTextComment.setText(ratingModelList.get(position).getCommentsRating());
-        holder.itemView.setOnClickListener(v -> System.out.println(ratingModelList.get(position)));
     }
 
     @Override
@@ -44,19 +44,18 @@ public class RecycleViewAdapterRating extends
         return ratingModelList.size();
     }
 
-    class CustomViewHolder extends RecyclerView.ViewHolder {
+    protected class CustomViewHolder extends RecyclerView.ViewHolder {
         @BindView(R.id.item_image_avatar)
         ImageView itemImageAvatar;
         @BindView(R.id.item_text_title)
         TextView itemTextTitle;
         @BindView(R.id.item_text_comment)
         TextView itemTextComment;
-        private View itemView;
 
         CustomViewHolder(View itemView) {
             super(itemView);
-            this.itemView = itemView;
             ButterKnife.bind(this, itemView);
+            itemView.setOnClickListener(v -> Log.d("TAG", ratingModelList.get(getAdapterPosition()).toString()));
         }
     }
 }

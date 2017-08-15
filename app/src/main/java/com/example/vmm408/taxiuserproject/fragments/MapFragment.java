@@ -23,12 +23,12 @@ import android.widget.LinearLayout;
 import android.widget.Toast;
 
 import com.bumptech.glide.Glide;
-import com.example.vmm408.taxiuserproject.CustomValueEventListener;
-import com.example.vmm408.taxiuserproject.activities.MapActivity;
+import com.example.vmm408.taxiuserproject.MyKeys;
+import com.example.vmm408.taxiuserproject.activities.AuthenticationActivity;
 import com.example.vmm408.taxiuserproject.R;
 import com.example.vmm408.taxiuserproject.models.OrderModel;
 import com.example.vmm408.taxiuserproject.models.UserModel;
-import com.example.vmm408.taxiuserproject.utils.Utils;
+import com.example.vmm408.taxiuserproject.utils.UserSharedUtils;
 import com.google.android.gms.location.FusedLocationProviderClient;
 import com.google.android.gms.location.LocationServices;
 import com.google.android.gms.maps.CameraUpdateFactory;
@@ -57,10 +57,9 @@ import static com.example.vmm408.taxiuserproject.FirebaseDataBaseKeys.ORDERS_REF
 import static com.example.vmm408.taxiuserproject.FirebaseDataBaseKeys.USERS_REF_KEY;
 
 public class MapFragment extends BaseFragment {
-    private static final int ITEM_PROFILE_KEY = 0;
-    private static final int ITEM_RATING_KEY = 1;
-    private static final int ITEM_ORDERS_HISTORY_KEY = 2;
-    private static final int ITEM_SETTINGS_KEY = 3;
+    public static MapFragment newInstance() {
+        return new MapFragment();
+    }
     @BindView(R.id.search_view_app_bar)
     SearchView searchViewAppBar;
     @BindView(R.id.im_btn_clear_search)
@@ -77,13 +76,13 @@ public class MapFragment extends BaseFragment {
     private Geocoder geocoder;
     private SearchView.SearchAutoComplete searchAutoComplete;
     private List<String> searchAddressList = new ArrayList<>();
-    private ValueEventListener findUserInBase = new CustomValueEventListener() {
+    private ValueEventListener userInBase = new CustomValueEventListener() {
         @Override
         public void onDataChange(DataSnapshot dataSnapshot) {
             UserModel.User.setUserModel(dataSnapshot.getValue(UserModel.class));
         }
     };
-    private ValueEventListener findCurrentOrderInBase = new CustomValueEventListener() {
+    private ValueEventListener currentOrderInBase = new CustomValueEventListener() {
         @Override
         public void onDataChange(DataSnapshot dataSnapshot) {
             if (dataSnapshot.getValue() != null) {
@@ -145,12 +144,12 @@ public class MapFragment extends BaseFragment {
 
     private void getUserFromBase() {
         if (UserModel.User.getUserModel().getIdUser() == null) {
-            reference = database.getReference(USERS_REF_KEY).child(Utils.userSigned(getContext()));
-            reference.addListenerForSingleValueEvent(findUserInBase);
+            reference = database.getReference(USERS_REF_KEY).child(UserSharedUtils.userSignedInApp(getContext()));
+            reference.addListenerForSingleValueEvent(userInBase);
         }
         if (OrderModel.Order.getOrderModel().getFromOrder() == null) {
-            reference = database.getReference(CURRENT_ORDER_REF_KEY).child(Utils.userSigned(getContext()));
-            reference.addListenerForSingleValueEvent(findCurrentOrderInBase);
+            reference = database.getReference(CURRENT_ORDER_REF_KEY).child(UserSharedUtils.userSignedInApp(getContext()));
+            reference.addListenerForSingleValueEvent(currentOrderInBase);
         }
     }
 
@@ -240,14 +239,14 @@ public class MapFragment extends BaseFragment {
     @OnClick(R.id.im_btn_profile)
     void imBtnProfile() {
         new AlertDialog.Builder(getContext()).setItems(R.array.menu_profile, (dialog, which) -> {
-            if (which == ITEM_PROFILE_KEY) {
-                ((MapActivity) getContext()).changeFragment(SaveProfileFragment.newInstance(true));
-            } else if (which == ITEM_RATING_KEY) {
-                ((MapActivity) getContext()).changeFragment(new RatingFragment());
-            } else if (which == ITEM_ORDERS_HISTORY_KEY) {
-                ((MapActivity) getContext()).changeFragment(new OrdersHistoryFragment());
-            } else if (which == ITEM_SETTINGS_KEY) {
-                ((MapActivity) getContext()).changeFragment(new SettingsFragment());
+            if (which == MyKeys.ITEM_PROFILE_KEY) {
+                ((AuthenticationActivity) getContext()).changeFragment(SaveProfileFragment.newInstance(true));
+            } else if (which == MyKeys.ITEM_RATING_KEY) {
+                ((AuthenticationActivity) getContext()).changeFragment(RatingFragment.newInstance());
+            } else if (which == MyKeys.ITEM_ORDERS_HISTORY_KEY) {
+                ((AuthenticationActivity) getContext()).changeFragment(OrdersHistoryFragment.newInstance());
+            } else if (which == MyKeys.ITEM_SETTINGS_KEY) {
+                ((AuthenticationActivity) getContext()).changeFragment(SettingsFragment.newInstance());
             }
         }).create().show();
     }
@@ -257,7 +256,7 @@ public class MapFragment extends BaseFragment {
     void fabNewOrder() {
 //        View view = getActivity().getLayoutInflater().inflate(R.layout.fragment_create_order, null);
         if (OrderModel.Order.getOrderModel().getFromOrder() == null) {
-            ((MapActivity) getContext()).changeFragment(new CreateOrderFragment());
+            ((AuthenticationActivity) getContext()).changeFragment(CreateOrderFragment.newInstance());
 //            new AlertDialog.Builder(getContext())
 //                    .setTitle("New Order")
 //                    .setView(view)

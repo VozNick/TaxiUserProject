@@ -9,10 +9,8 @@ import android.view.View;
 import android.view.ViewGroup;
 
 import com.example.vmm408.taxiuserproject.activities.AuthenticationActivity;
-import com.example.vmm408.taxiuserproject.CustomValueEventListener;
-import com.example.vmm408.taxiuserproject.activities.MapActivity;
 import com.example.vmm408.taxiuserproject.R;
-import com.example.vmm408.taxiuserproject.utils.Utils;
+import com.example.vmm408.taxiuserproject.utils.UserSharedUtils;
 import com.google.android.gms.auth.api.Auth;
 import com.google.android.gms.auth.api.signin.GoogleSignInAccount;
 import com.google.android.gms.auth.api.signin.GoogleSignInOptions;
@@ -28,6 +26,10 @@ import butterknife.OnClick;
 import static com.example.vmm408.taxiuserproject.FirebaseDataBaseKeys.USERS_REF_KEY;
 
 public class SignInFragment extends BaseFragment {
+    public static SignInFragment newInstance() {
+        return new SignInFragment();
+    }
+
     private static final int SIGN_IN_KEY = 9001;
     @BindView(R.id.sign_in_button)
     SignInButton signInButton;
@@ -38,9 +40,9 @@ public class SignInFragment extends BaseFragment {
         @Override
         public void onDataChange(DataSnapshot dataSnapshot) {
             if (dataSnapshot.hasChildren()) {
-                Utils.saveUserToShared(getContext(), dataSnapshot.getKey());
+                UserSharedUtils.saveUserToShared(getContext(), dataSnapshot.getKey());
                 progressDialog.dismiss();
-                startActivity(new Intent(getContext(), MapActivity.class));
+                ((AuthenticationActivity) getContext()).changeFragment(new MapFragment());
                 return;
             }
             progressDialog.dismiss();
