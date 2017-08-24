@@ -12,10 +12,10 @@ import android.widget.LinearLayout;
 import android.widget.TextView;
 
 import com.example.vmm408.taxiuserproject.R;
+import com.example.vmm408.taxiuserproject.activities.MainActivity;
 import com.example.vmm408.taxiuserproject.adapters.EndlessScrollListener;
 import com.example.vmm408.taxiuserproject.adapters.RecyclerViewAdapterOrders;
 import com.example.vmm408.taxiuserproject.models.OrderModel;
-import com.example.vmm408.taxiuserproject.models.UserModel;
 import com.google.firebase.database.DataSnapshot;
 import com.google.firebase.database.Query;
 import com.google.firebase.database.ValueEventListener;
@@ -24,8 +24,11 @@ import java.util.ArrayList;
 import java.util.List;
 
 import butterknife.BindView;
+import butterknife.OnClick;
 
 import static com.example.vmm408.taxiuserproject.FirebaseDataBaseKeys.ORDERS_REF_KEY;
+import static com.example.vmm408.taxiuserproject.models.UserModel.SignedUser;
+import static com.example.vmm408.taxiuserproject.models.OrderModel.CurrentOrder;
 
 public class OrdersHistoryFragment extends BaseFragment {
     public static OrdersHistoryFragment newInstance() {
@@ -47,7 +50,7 @@ public class OrdersHistoryFragment extends BaseFragment {
             loadMore();
         }
     };
-    private ValueEventListener getArchiveOrders = new CustomValueEventListener() {
+    private ValueEventListener getArchiveOrders = new DatabaseValueEventListener() {
         @Override
         public void onDataChange(DataSnapshot dataSnapshot) {
             List<OrderModel> tempList = new ArrayList<>();
@@ -72,9 +75,9 @@ public class OrdersHistoryFragment extends BaseFragment {
     @Override
     public void onViewCreated(View view, @Nullable Bundle savedInstanceState) {
         super.onViewCreated(view, savedInstanceState);
-        if (OrderModel.Order.getOrderModel().getFromOrder() != null) {
+        if (CurrentOrder.getOrderModel() != null) {
             textCurrentOrder.setVisibility(View.VISIBLE);
-            currentOrderContainer.addView(super.initCurrentOrderView());
+            currentOrderContainer.addView(super.initOrderView(CurrentOrder.getOrderModel()));
         }
         initRecyclerView();
         loadMore();
@@ -88,8 +91,13 @@ public class OrdersHistoryFragment extends BaseFragment {
     }
 
     private void loadMore() {
-        reference = database.getReference(ORDERS_REF_KEY).child(UserModel.User.getUserModel().getIdUser());
+        reference = database.getReference(ORDERS_REF_KEY).child(SignedUser.getUserModel().getIdUser());
         Query query = reference.orderByKey().startAt(lastItemFromBase).limitToFirst(5);
         query.addListenerForSingleValueEvent(getArchiveOrders);
+    }
+
+    @OnClick(R.id.image_view_btn_back)
+    void imViewBtnBack(){
+        ((MainActivity)getContext()).changeFragment(MapFragment.newInstance());
     }
 }

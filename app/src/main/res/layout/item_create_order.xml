@@ -13,33 +13,18 @@
         android:paddingRight="@dimen/layout_padding_right"
         android:paddingTop="24dp">
 
-        <LinearLayout
+        <android.support.design.widget.TextInputLayout
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
-            android:orientation="horizontal">
+            android:layout_marginBottom="@dimen/et_margin_bottom"
+            android:layout_marginTop="@dimen/et_margin_top">
 
-            <android.support.design.widget.TextInputLayout
-                android:id="@+id/order_from_layout"
+            <EditText
+                android:id="@+id/edit_text_order_from"
                 android:layout_width="match_parent"
                 android:layout_height="wrap_content"
-                android:layout_marginBottom="@dimen/et_margin_bottom"
-                android:layout_marginTop="@dimen/et_margin_top"
-                android:layout_weight="1">
-
-                <EditText
-                    android:id="@+id/edit_text_order_from"
-                    android:layout_width="match_parent"
-                    android:layout_height="wrap_content"
-                    android:hint="@string/hint_edit_text_order_from" />
-            </android.support.design.widget.TextInputLayout>
-
-            <ImageView
-                android:id="@+id/im_btn_my_location"
-                android:layout_width="100dp"
-                android:layout_height="40dp"
-                android:layout_weight="1"
-                android:src="@drawable/ic_my_location_black_24dp" />
-        </LinearLayout>
+                android:hint="@string/hint_edit_text_order_from" />
+        </android.support.design.widget.TextInputLayout>
 
         <android.support.design.widget.TextInputLayout
             android:layout_width="match_parent"
@@ -81,14 +66,5 @@
                 android:hint="@string/hint_edit_text_order_comment"
                 android:lines="3" />
         </android.support.design.widget.TextInputLayout>
-
-        <android.support.v7.widget.AppCompatButton
-        android:id="@+id/btn_create_order"
-        android:layout_width="match_parent"
-        android:layout_height="wrap_content"
-        android:layout_marginBottom="@dimen/button_margin_bottom"
-        android:layout_marginTop="@dimen/button_margin_top"
-        android:padding="@dimen/button_padding"
-        android:text="@string/btn_create_order" />
     </LinearLayout>
 </ScrollView>

@@ -2,8 +2,8 @@ package com.example.vmm408.taxiuserproject.models;
 
 public class LocationModel {
     private String idUserLocation;
-    private double latitudeLocation;
-    private double longitudeLocation;
+    private Double latitudeLocation;
+    private Double longitudeLocation;
 
     public void setIdUserLocation(String idUserLocation) {
         this.idUserLocation = idUserLocation;
@@ -13,19 +13,19 @@ public class LocationModel {
         return idUserLocation;
     }
 
-    public void setLatitudeLocation(double latitudeLocation) {
+    public void setLatitudeLocation(Double latitudeLocation) {
         this.latitudeLocation = latitudeLocation;
     }
 
-    public double getLatitudeLocation() {
+    public Double getLatitudeLocation() {
         return latitudeLocation;
     }
 
-    public void setLongitudeLocation(double longitudeLocation) {
+    public void setLongitudeLocation(Double longitudeLocation) {
         this.longitudeLocation = longitudeLocation;
     }
 
-    public double getLongitudeLocation() {
+    public Double getLongitudeLocation() {
         return longitudeLocation;
     }
 }

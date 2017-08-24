@@ -42,6 +42,7 @@
     <string name="hint_birthday">BirthDay</string>
     <string name="btn_save">Save</string>
     <string name="btn_cancel">Cancel</string>
+    <string name="toast_load_photo_error">can`t load photo from gallery</string>
 
 
     // fragment_create_order
@@ -50,6 +51,7 @@
     <string name="hint_edit_text_order_price">Price</string>
     <string name="hint_edit_text_order_comment">Comment</string>
     <string name="btn_create_order">Create Order</string>
+    <string name="btn_cancel_order">Cancel</string>
 
 
     // item_menu_profile

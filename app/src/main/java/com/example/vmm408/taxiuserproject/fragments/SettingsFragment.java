@@ -7,7 +7,7 @@ import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
 
-import com.example.vmm408.taxiuserproject.activities.AuthenticationActivity;
+import com.example.vmm408.taxiuserproject.activities.MainActivity;
 import com.example.vmm408.taxiuserproject.R;
 import com.example.vmm408.taxiuserproject.utils.UserSharedUtils;
 
@@ -42,6 +42,6 @@ public class SettingsFragment extends BaseFragment {
 
     private void signOut() {
         UserSharedUtils.deleteUserFromShared(getContext());
-        ((AuthenticationActivity) getContext()).changeFragment(SignInFragment.newInstance());
+        ((MainActivity) getContext()).changeFragment(SignInFragment.newInstance());
     }
 }

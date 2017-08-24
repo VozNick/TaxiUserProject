@@ -6,7 +6,7 @@ public class RatingModel {
     private String idUserRating;
     private String idUserAuthorRating;
     private Date timeRating;
-    private double starsRating;
+    private Double starsRating;
     private String commentsRating;
 
     public void setIdUserRating(String idUserRating) {
@@ -33,11 +33,11 @@ public class RatingModel {
         return timeRating;
     }
 
-    public void setStarsRating(double starsRating) {
+    public void setStarsRating(Double starsRating) {
         this.starsRating = starsRating;
     }
 
-    public double getStarsRating() {
+    public Double getStarsRating() {
         return starsRating;
     }
 

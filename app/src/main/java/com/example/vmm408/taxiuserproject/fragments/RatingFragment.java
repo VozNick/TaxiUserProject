@@ -75,8 +75,8 @@ public class RatingFragment extends BaseFragment {
 //        for (int i = 10 * offset; i < (10 * offset) + 10; i++) {
 //            tempList.add(ratingModels.get(i));
 //            (reference = database.getReference("ratings"))
-//                    .equalTo(UserModel.User.getUserModel().getIdUser())
-//                    .addValueEventListener(new CustomValueEventListener() {
+//                    .equalTo(UserModel.SignedUser.getUserModel().getIdUser())
+//                    .addValueEventListener(new DatabaseValueEventListener() {
 //                        @Override
 //                        public void onDataChange(DataSnapshot dataSnapshot) {
 //

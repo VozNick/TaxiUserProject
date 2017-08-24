@@ -16,18 +16,21 @@
     <TextView
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
+        android:layout_marginLeft="16dp"
         android:text="@string/item_text_from" />
 
     <TextView
         android:id="@+id/text_from_order"
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
+        android:layout_marginLeft="16dp"
         android:textSize="20sp" />
 
 
     <TextView
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
+        android:layout_marginLeft="16dp"
         android:layout_marginTop="10dp"
         android:text="@string/item_text_destination" />
 
@@ -35,12 +38,14 @@
         android:id="@+id/text_destination_order"
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
+        android:layout_marginLeft="16dp"
         android:textSize="20sp" />
 
 
     <TextView
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
+        android:layout_marginLeft="16dp"
         android:layout_marginTop="10dp"
         android:text="@string/item_text_price" />
 
@@ -48,12 +53,14 @@
         android:id="@+id/text_price_order"
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
+        android:layout_marginLeft="16dp"
         android:textSize="20sp" />
 
 
     <TextView
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
+        android:layout_marginLeft="16dp"
         android:layout_marginTop="10dp"
         android:text="@string/item_text_comment" />
 
@@ -61,30 +68,6 @@
         android:id="@+id/text_comment_order"
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
+        android:layout_marginLeft="16dp"
         android:textSize="20sp" />
-
-    <LinearLayout
-        android:id="@+id/btn_current_order_layout"
-        android:layout_width="match_parent"
-        android:layout_height="wrap_content"
-        android:visibility="gone">
-
-        <TextView
-            android:id="@+id/tv_link_edit_order"
-            android:layout_width="match_parent"
-            android:layout_height="wrap_content"
-            android:layout_weight="1"
-            android:text="@string/tv_link_edit_order"
-            android:textAlignment="center"
-            android:textSize="25sp" />
-
-        <TextView
-            android:id="@+id/tv_link_delete_order"
-            android:layout_width="match_parent"
-            android:layout_height="wrap_content"
-            android:layout_weight="1"
-            android:text="@string/tv_link_delete_order"
-            android:textAlignment="center"
-            android:textSize="25sp" />
-    </LinearLayout>
 </LinearLayout>

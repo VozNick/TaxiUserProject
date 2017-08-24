@@ -8,7 +8,8 @@ import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
 
-import com.example.vmm408.taxiuserproject.activities.AuthenticationActivity;
+import com.example.vmm408.taxiuserproject.MyKeys;
+import com.example.vmm408.taxiuserproject.activities.MainActivity;
 import com.example.vmm408.taxiuserproject.R;
 import com.example.vmm408.taxiuserproject.utils.UserSharedUtils;
 import com.google.android.gms.auth.api.Auth;
@@ -30,23 +31,22 @@ public class SignInFragment extends BaseFragment {
         return new SignInFragment();
     }
 
-    private static final int SIGN_IN_KEY = 9001;
     @BindView(R.id.sign_in_button)
     SignInButton signInButton;
     private GoogleSignInAccount signInAccount;
     private GoogleApiClient.OnConnectionFailedListener failedListener =
             connectionResult -> makeToast("connection failed");
-    private ValueEventListener getUserFromBase = new CustomValueEventListener() {
+    private ValueEventListener getUserFromBase = new DatabaseValueEventListener() {
         @Override
         public void onDataChange(DataSnapshot dataSnapshot) {
             if (dataSnapshot.hasChildren()) {
                 UserSharedUtils.saveUserToShared(getContext(), dataSnapshot.getKey());
                 progressDialog.dismiss();
-                ((AuthenticationActivity) getContext()).changeFragment(new MapFragment());
+                ((MainActivity) getContext()).changeFragment(MapFragment.newInstance());
                 return;
             }
             progressDialog.dismiss();
-            ((AuthenticationActivity) getContext()).changeFragment(SaveProfileFragment.newInstance(
+            ((MainActivity) getContext()).changeFragment(SaveProfileFragment.newInstance(
                     signInAccount.getId(),
                     String.valueOf(signInAccount.getPhotoUrl()),
                     signInAccount.getGivenName() + " " + signInAccount.getFamilyName())
@@ -79,7 +79,7 @@ public class SignInFragment extends BaseFragment {
     @OnClick(R.id.sign_in_button)
     void signIn() {
         initProgressDialog().show();
-        startActivityForResult(Auth.GoogleSignInApi.getSignInIntent(googleApiClient), SIGN_IN_KEY);
+        startActivityForResult(Auth.GoogleSignInApi.getSignInIntent(googleApiClient), MyKeys.SIGN_IN_KEY);
     }
 
     private ProgressDialog initProgressDialog() {
@@ -91,7 +91,7 @@ public class SignInFragment extends BaseFragment {
     @Override
     public void onActivityResult(int requestCode, int resultCode, Intent data) {
         super.onActivityResult(requestCode, resultCode, data);
-        if (requestCode == SIGN_IN_KEY) {
+        if (requestCode == MyKeys.SIGN_IN_KEY) {
             handleSignInResult(Auth.GoogleSignInApi.getSignInResultFromIntent(data));
         }
     }

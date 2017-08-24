@@ -16,6 +16,7 @@ import android.support.annotation.RequiresApi;
 import android.support.v4.app.ActivityCompat;
 import android.support.v7.app.AlertDialog;
 import android.util.Base64;
+import android.util.Patterns;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
@@ -24,10 +25,9 @@ import android.widget.EditText;
 import android.widget.Spinner;
 import android.widget.TextView;
 
-import com.bumptech.glide.Glide;
 import com.example.vmm408.taxiuserproject.MyKeys;
 import com.example.vmm408.taxiuserproject.R;
-import com.example.vmm408.taxiuserproject.activities.AuthenticationActivity;
+import com.example.vmm408.taxiuserproject.activities.MainActivity;
 import com.example.vmm408.taxiuserproject.models.UserModel;
 import com.example.vmm408.taxiuserproject.utils.UserSharedUtils;
 
@@ -41,6 +41,7 @@ import de.hdodenhof.circleimageview.CircleImageView;
 import id.zelory.compressor.Compressor;
 
 import static com.example.vmm408.taxiuserproject.FirebaseDataBaseKeys.USERS_REF_KEY;
+import static com.example.vmm408.taxiuserproject.models.UserModel.SignedUser;
 
 public class SaveProfileFragment extends BaseFragment {
     public static SaveProfileFragment newInstance(String userId,
@@ -78,7 +79,6 @@ public class SaveProfileFragment extends BaseFragment {
     private String userId;
     private Bitmap bitmapAvatar;
     private String googlePhotoPath;
-
     private boolean editMode;
 
     @Nullable
@@ -112,35 +112,31 @@ public class SaveProfileFragment extends BaseFragment {
         }
         userId = bundle.getString(MyKeys.USER_ID_KEY);
         googlePhotoPath = bundle.getString(MyKeys.PHOTO_KEY);
-        downloadPhotoUri(bundle.getString(MyKeys.PHOTO_KEY));
+        super.loadPhotoUrl(bundle.getString(MyKeys.PHOTO_KEY), imageUserAvatar);
         etFullName.setText(bundle.getString(MyKeys.FULL_NAME_KEY));
     }
 
     private void fillWidgetsFromEditMode() {
         initAvatar();
-        userId = UserModel.User.getUserModel().getIdUser();
-        etFullName.setText(UserModel.User.getUserModel().getFullNameUser());
-        etPhone.setText(UserModel.User.getUserModel().getPhoneUser());
-        tAge.setText(UserModel.User.getUserModel().getAgeUser());
+        userId = SignedUser.getUserModel().getIdUser();
+        etFullName.setText(SignedUser.getUserModel().getFullNameUser());
+        etPhone.setText(SignedUser.getUserModel().getPhoneUser());
+        tAge.setText(SignedUser.getUserModel().getAgeUser());
         btnCancelProfile.setVisibility(View.VISIBLE);
     }
 
     private void initAvatar() {
-        String avatar = UserModel.User.getUserModel().getAvatarUser();
+            String avatar = SignedUser.getUserModel().getAvatarUser();
         if (avatar == null) {
             imageUserAvatar.setImageResource(R.mipmap.ic_launcher);
         } else if (avatar.startsWith("https://lh3.googleusercontent.com/")) {
             googlePhotoPath = avatar;
-            downloadPhotoUri(avatar);
+            super.loadPhotoUrl(avatar, imageUserAvatar);
         } else {
-            byte[] imageBytes = Base64.decode(UserModel.User.getUserModel().getAvatarUser(), Base64.DEFAULT);
+            byte[] imageBytes = Base64.decode(UserModel.SignedUser.getUserModel().getAvatarUser(), Base64.DEFAULT);
             bitmapAvatar = BitmapFactory.decodeByteArray(imageBytes, 0, imageBytes.length);
             imageUserAvatar.setImageBitmap(bitmapAvatar);
         }
-    }
-
-    private void downloadPhotoUri(String uri) {
-        Glide.with(getActivity()).load(uri).into(imageUserAvatar);
     }
 
     @RequiresApi(api = Build.VERSION_CODES.JELLY_BEAN)
@@ -158,15 +154,8 @@ public class SaveProfileFragment extends BaseFragment {
 
     @OnClick(R.id.image_user_avatar)
     public void avatarUser() {
-        new AlertDialog.Builder(getActivity()).setItems(R.array.menu_new_avatar, (dialog, which) -> {
-            if (which == MyKeys.IMAGE_CAPTURE_KEY) {
-                initActivityResult(MyKeys.IMAGE_CAPTURE_KEY);
-            } else if (which == MyKeys.PICK_PHOTO_KEY) {
-                initActivityResult(MyKeys.PICK_PHOTO_KEY);
-            } else if (which == MyKeys.DELETE_PHOTO_KEY) {
-                initActivityResult(MyKeys.DELETE_PHOTO_KEY);
-            }
-        }).create().show();
+        new AlertDialog.Builder(getContext()).setItems(R.array.menu_new_avatar, (dialog, which) ->
+                initActivityResult(which)).show();
     }
 
     @OnClick(R.id.text_age)
@@ -205,21 +194,21 @@ public class SaveProfileFragment extends BaseFragment {
         if (requestCode == MyKeys.IMAGE_CAPTURE_KEY) {
             bitmapAvatar = (Bitmap) data.getExtras().get("data");
         } else if (requestCode == MyKeys.PICK_PHOTO_KEY) {
-            bitmapAvatar = new Compressor(getActivity()).compressToBitmap(new File(getPathFromURI(data.getData())));
+            bitmapAvatar = new Compressor(getContext()).compressToBitmap(new File(getPathFromURL(data.getData())));
         } else if (requestCode == MyKeys.DELETE_PHOTO_KEY) {
             imageUserAvatar.setImageBitmap(bitmapAvatar);
             googlePhotoPath = null;
         }
     }
 
-    public String getPathFromURI(Uri uri) {
+    public String getPathFromURL(Uri url) {
         Cursor cursor = null;
         try {
-            cursor = getActivity().getContentResolver().query(uri, new String[]{"_data"}, null, null, null);
+            cursor = getContext().getContentResolver().query(url, new String[]{"_data"}, null, null, null);
             if (cursor != null && cursor.moveToFirst())
                 return cursor.getString(cursor.getColumnIndexOrThrow("_data"));
         } catch (NullPointerException e) {
-            e.printStackTrace();
+            super.makeToast(getResources().getString(R.string.toast_load_photo_error));
         }
         if (cursor != null)
             cursor.close();
@@ -228,22 +217,32 @@ public class SaveProfileFragment extends BaseFragment {
 
     @OnClick(R.id.btn_save_profile)
     void btnSaveProfile() {
-        if (super.validate(etFullName) && super.validate(etPhone)) {
+        if (super.validate(etFullName) && validatePhone()) {
             reference = database.getReference(USERS_REF_KEY).child(userId);
             reference.setValue(initUserData());
             UserSharedUtils.saveUserToShared(getContext(), userId);
-            ((AuthenticationActivity) getContext()).changeFragment(MapFragment.newInstance());
+            ((MainActivity) getContext()).changeFragment(MapFragment.newInstance());
         }
     }
 
+    private boolean validatePhone() {
+        if (!Patterns.PHONE.matcher(etPhone.getText().toString()).matches()) {
+            etPhone.setError(getString(R.string.text_error_phone_format));
+            return false;
+        }
+        return true;
+    }
+
     private UserModel initUserData() {
-        UserModel.User.getUserModel().setIdUser(userId);
-        UserModel.User.getUserModel().setAvatarUser(googlePhotoPath != null ? googlePhotoPath : fromFileToString());
-        UserModel.User.getUserModel().setFullNameUser(etFullName.getText().toString());
-        UserModel.User.getUserModel().setPhoneUser(etPhone.getText().toString());
-        UserModel.User.getUserModel().setGenderUser(spGender.getSelectedItem().toString());
-        UserModel.User.getUserModel().setAgeUser(tAge.getText().toString());
-        return UserModel.User.getUserModel();
+        UserModel model = new UserModel();
+        model.setIdUser(userId);
+        model.setAvatarUser(googlePhotoPath != null ? googlePhotoPath : fromFileToString());
+        model.setFullNameUser(etFullName.getText().toString());
+        model.setPhoneUser(etPhone.getText().toString());
+        model.setGenderUser(spGender.getSelectedItem().toString());
+        model.setAgeUser(tAge.getText().toString());
+        SignedUser.setUserModel(model);
+        return model;
     }
 
     private String fromFileToString() {
@@ -258,6 +257,6 @@ public class SaveProfileFragment extends BaseFragment {
     @OnClick(R.id.btn_cancel_profile)
     void btnCancelProfile() {
         btnCancelProfile.setVisibility(View.GONE);
-        ((AuthenticationActivity) getContext()).changeFragment(MapFragment.newInstance());
+        ((MainActivity) getContext()).changeFragment(MapFragment.newInstance());
     }
 }

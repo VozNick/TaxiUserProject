@@ -1,5 +1,6 @@
 package com.example.vmm408.taxiuserproject.adapters;
 
+import android.support.v7.app.AlertDialog;
 import android.support.v7.widget.RecyclerView;
 import android.util.Log;
 import android.view.LayoutInflater;
@@ -8,6 +9,7 @@ import android.view.ViewGroup;
 import android.widget.TextView;
 
 import com.example.vmm408.taxiuserproject.R;
+import com.example.vmm408.taxiuserproject.activities.MainActivity;
 import com.example.vmm408.taxiuserproject.models.OrderModel;
 
 import java.util.ArrayList;
@@ -56,7 +58,28 @@ public class RecyclerViewAdapterOrders extends
         CustomViewHolder(View itemView) {
             super(itemView);
             ButterKnife.bind(this, itemView);
-            itemView.setOnClickListener(v -> Log.d("TAG", orderModelList.get(getAdapterPosition()).toString()));
+            itemView.setOnClickListener(v -> {
+                Log.d("TAG", getAdapterPosition() + "");
+                new AlertDialog.Builder(itemView.getContext())
+                        .setView(initOrderView(itemView, orderModelList.get(getAdapterPosition())))
+                        .setNeutralButton(itemView.getResources().getString(R.string.neutral_btn_back),
+                                (dialog, which) -> dialog.dismiss())
+                        .show();
+            });
+        }
+
+        private View initOrderView(View itemView, OrderModel model) {
+            View currentOrderView = ((MainActivity) itemView.getContext())
+                    .getLayoutInflater().inflate(R.layout.item_current_order, null);
+            TextView from = ButterKnife.findById(currentOrderView, R.id.text_from_order);
+            from.setText(model.getFromOrder());
+            TextView destination = ButterKnife.findById(currentOrderView, R.id.text_destination_order);
+            destination.setText(model.getDestinationOrder());
+            TextView price = ButterKnife.findById(currentOrderView, R.id.text_price_order);
+            price.setText(model.getPriceOrder());
+            TextView comment = ButterKnife.findById(currentOrderView, R.id.text_comment_order);
+            comment.setText(model.getCommentOrder());
+            return currentOrderView;
         }
     }
 }

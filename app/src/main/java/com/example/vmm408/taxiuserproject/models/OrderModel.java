@@ -1,7 +1,5 @@
 package com.example.vmm408.taxiuserproject.models;
 
-import java.util.Date;
-
 public class OrderModel {
     private String idUserOrder;
     private String fromOrder;
@@ -9,7 +7,7 @@ public class OrderModel {
     private String priceOrder;
     private String commentOrder;
     private String timeOrder;
-    private boolean orderAccepted;
+    private String orderAcceptedUser;
 
     public void setIdUserOrder(String idUserOrder) {
         this.idUserOrder = idUserOrder;
@@ -59,24 +57,12 @@ public class OrderModel {
         return timeOrder;
     }
 
-    public void setOrderAccepted(boolean orderAccepted) {
-        this.orderAccepted = orderAccepted;
+    public void setOrderAcceptedUser(String orderAcceptedUser) {
+        this.orderAcceptedUser = orderAcceptedUser;
     }
 
-    public boolean isOrderAccepted() {
-        return orderAccepted;
-    }
-
-    public static class Order {
-        private static OrderModel orderModel = new OrderModel();
-
-        public static void setOrderModel(OrderModel orderModel) {
-            Order.orderModel = orderModel;
-        }
-
-        public static OrderModel getOrderModel() {
-            return orderModel;
-        }
+    public String getOrderAcceptedUser() {
+        return orderAcceptedUser;
     }
 
     @Override
@@ -88,7 +74,19 @@ public class OrderModel {
                 ", priceOrder=" + priceOrder +
                 ", commentOrder='" + commentOrder + '\'' +
                 ", timeOrder=" + timeOrder +
-                ", orderAccepted=" + orderAccepted +
+                ", orderAcceptedUser=" + orderAcceptedUser +
                 '}';
+    }
+
+    public static class CurrentOrder {
+        private static OrderModel orderModel;
+
+        public static void setOrderModel(OrderModel orderModel) {
+            CurrentOrder.orderModel = orderModel;
+        }
+
+        public static OrderModel getOrderModel() {
+            return orderModel;
+        }
     }
 }

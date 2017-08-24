@@ -7,12 +7,10 @@ public class UserModel {
     private String genderUser;
     private String ageUser;
     private String phoneUser;
-    private double ratingUser;
+    private Double ratingUser;
     private String ratingNumUser;
 
-    private String idCurrentOrder;
-
-    private double experienceDriver;
+    private Double experienceDriver;
     private String carModelDriver;
     private String numPlateCarDriver;
 
@@ -67,11 +65,11 @@ public class UserModel {
         return phoneUser;
     }
 
-    public void setRatingUser(double ratingUser) {
+    public void setRatingUser(Double ratingUser) {
         this.ratingUser = ratingUser;
     }
 
-    public double getRatingUser() {
+    public Double getRatingUser() {
         return ratingUser;
     }
 
@@ -83,20 +81,12 @@ public class UserModel {
         return ratingNumUser;
     }
 
-    public void setIdCurrentOrder(String idCurrentOrder) {
-        this.idCurrentOrder = idCurrentOrder;
-    }
-
-    public String getIdCurrentOrder() {
-        return idCurrentOrder;
-    }
-
-    public void setExperienceDriver(double experienceDriver) {
-        this.experienceDriver = experienceDriver;
-    }
-
-    public double getExperienceDriver() {
+    public Double getExperienceDriver() {
         return experienceDriver;
+    }
+
+    public void setExperienceDriver(Double experienceDriver) {
+        this.experienceDriver = experienceDriver;
     }
 
     public void setCarModelDriver(String carModelDriver) {
@@ -115,18 +105,6 @@ public class UserModel {
         return numPlateCarDriver;
     }
 
-    public static class User {
-        private static UserModel userModel = new UserModel();
-
-        public static void setUserModel(UserModel userModel) {
-            User.userModel = userModel;
-        }
-
-        public static UserModel getUserModel() {
-            return userModel;
-        }
-    }
-
     @Override
     public String toString() {
         return "UserModel{" +
@@ -138,10 +116,21 @@ public class UserModel {
                 ", phoneUser='" + phoneUser + '\'' +
                 ", ratingUser=" + ratingUser +
                 ", ratingNumUser='" + ratingNumUser + '\'' +
-                ", idCurrentOrder='" + idCurrentOrder + '\'' +
                 ", experienceDriver=" + experienceDriver +
                 ", carModelDriver='" + carModelDriver + '\'' +
                 ", numPlateCarDriver='" + numPlateCarDriver + '\'' +
                 '}';
+    }
+
+    public static class SignedUser {
+        private static UserModel userModel;
+
+        public static void setUserModel(UserModel userModel) {
+            SignedUser.userModel = userModel;
+        }
+
+        public static UserModel getUserModel() {
+            return userModel;
+        }
     }
 }

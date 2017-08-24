@@ -44,8 +44,8 @@
         android:id="@+id/item_btn_more"
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
+        android:layout_alignBottom="@id/text_destination_order"
         android:layout_alignParentRight="true"
-        android:layout_below="@id/text_destination_order"
         android:padding="8dp"
         android:text="MORE"
         android:textSize="16dp" />
