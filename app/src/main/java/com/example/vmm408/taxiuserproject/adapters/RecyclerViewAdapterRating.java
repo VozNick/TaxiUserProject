@@ -1,7 +1,6 @@
 package com.example.vmm408.taxiuserproject.adapters;
 
 import android.support.v7.widget.RecyclerView;
-import android.util.Log;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
@@ -34,7 +33,7 @@ public class RecyclerViewAdapterRating extends
 
     @Override
     public void onBindViewHolder(CustomViewHolder holder, int position) {
-        holder.itemImageAvatar.setImageResource(R.mipmap.ic_launcher);
+        holder.itemImageAvatar.setImageResource(R.drawable.ic_person_black_24dp);
         holder.itemTextTitle.setText(ratingModelList.get(position).getIdUserRating());
         holder.itemTextComment.setText(ratingModelList.get(position).getCommentsRating());
     }
@@ -55,7 +54,6 @@ public class RecyclerViewAdapterRating extends
         CustomViewHolder(View itemView) {
             super(itemView);
             ButterKnife.bind(this, itemView);
-            itemView.setOnClickListener(v -> Log.d("TAG", ratingModelList.get(getAdapterPosition()).toString()));
         }
     }
 }

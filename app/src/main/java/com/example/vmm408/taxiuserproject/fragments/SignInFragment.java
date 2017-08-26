@@ -35,7 +35,7 @@ public class SignInFragment extends BaseFragment {
     SignInButton signInButton;
     private GoogleSignInAccount signInAccount;
     private GoogleApiClient.OnConnectionFailedListener failedListener =
-            connectionResult -> makeToast("connection failed");
+            connectionResult -> makeToast(getResources().getString(R.string.toast_connection_failed));
     private ValueEventListener getUserFromBase = new DatabaseValueEventListener() {
         @Override
         public void onDataChange(DataSnapshot dataSnapshot) {

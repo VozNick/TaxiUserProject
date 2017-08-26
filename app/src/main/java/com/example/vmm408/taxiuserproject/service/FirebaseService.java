@@ -11,23 +11,22 @@ import android.support.annotation.Nullable;
 import android.support.v7.app.NotificationCompat;
 
 import com.example.vmm408.taxiuserproject.R;
-import com.example.vmm408.taxiuserproject.eventBusModel.AppIsForegroundEventBusModel;
 import com.example.vmm408.taxiuserproject.fragments.DatabaseValueEventListener;
+import com.example.vmm408.taxiuserproject.models.UserModel;
 import com.example.vmm408.taxiuserproject.receiver.NotificationClickReceiver;
 import com.example.vmm408.taxiuserproject.utils.UserSharedUtils;
 import com.google.firebase.database.DataSnapshot;
 import com.google.firebase.database.DatabaseReference;
 import com.google.firebase.database.FirebaseDatabase;
 
-import org.greenrobot.eventbus.EventBus;
-import org.greenrobot.eventbus.Subscribe;
-
 import static com.example.vmm408.taxiuserproject.FirebaseDataBaseKeys.CURRENT_ORDER_REF_KEY;
+import static com.example.vmm408.taxiuserproject.FirebaseDataBaseKeys.USERS_REF_KEY;
 import static com.example.vmm408.taxiuserproject.models.OrderModel.CurrentOrder;
+import static com.example.vmm408.taxiuserproject.models.UserModel.OrderAcceptedDriver;
 
 public class FirebaseService extends Service {
     private FirebaseDatabase database;
-    private boolean appInForeground = true;
+    private DatabaseReference reference;
     private DatabaseValueEventListener currentOrderValue = new DatabaseValueEventListener() {
         @Override
         public void onDataChange(DataSnapshot dataSnapshot) {
@@ -35,22 +34,26 @@ public class FirebaseService extends Service {
                 stopSelf();
                 return;
             }
-            if (dataSnapshot.getValue().equals("notAccepted")) {
+            if (dataSnapshot.getValue().equals(getResources().getString(R.string.text_status_order_not_accepted))) {
                 return;
             }
-            CurrentOrder.getOrderModel().setOrderAcceptedUser(dataSnapshot.getValue().toString());
-            if (!appInForeground) {
-                ((NotificationManager) getSystemService(Context.NOTIFICATION_SERVICE))
-                        .notify(111, createNotification());
-            }
+            CurrentOrder.getOrderModel().setOrderAcceptedDriver(dataSnapshot.getValue().toString());
+            loadOrderAcceptedDriver();
+            ((NotificationManager) getSystemService(Context.NOTIFICATION_SERVICE))
+                    .notify(111, createNotification());
+
         }
     };
-
+    private DatabaseValueEventListener orderAcceptedDriver = new DatabaseValueEventListener() {
+        @Override
+        public void onDataChange(DataSnapshot dataSnapshot) {
+            OrderAcceptedDriver.setUserModel(dataSnapshot.getValue(UserModel.class));
+        }
+    };
 
     @Override
     public void onCreate() {
         super.onCreate();
-        EventBus.getDefault().register(this);
     }
 
     @Override
@@ -67,11 +70,17 @@ public class FirebaseService extends Service {
     }
 
     private void initValueListener() {
-        DatabaseReference reference = database
+        reference = database
                 .getReference(CURRENT_ORDER_REF_KEY)
                 .child(UserSharedUtils.userSignedInApp(getApplicationContext()))
-                .child("orderAcceptedUser");
+                .child("orderAcceptedDriver");
         reference.addValueEventListener(currentOrderValue);
+    }
+
+    private void loadOrderAcceptedDriver() {
+        reference = database.getReference(USERS_REF_KEY)
+                .child(CurrentOrder.getOrderModel().getOrderAcceptedDriver());
+        reference.addListenerForSingleValueEvent(orderAcceptedDriver);
     }
 
     private Notification createNotification() {
@@ -87,16 +96,5 @@ public class FirebaseService extends Service {
                 .addAction(new NotificationCompat.Action(0, "OK", pendingIntent))
                 .setSmallIcon(R.drawable.ic_chat_black_24dp)
                 .build();
-    }
-
-    @Subscribe
-    public void getEvent(AppIsForegroundEventBusModel eventBusModel) {
-        appInForeground = eventBusModel.getAppForeground().getAppForeground();
-    }
-
-    @Override
-    public void onDestroy() {
-        super.onDestroy();
-        EventBus.getDefault().unregister(this);
     }
 }

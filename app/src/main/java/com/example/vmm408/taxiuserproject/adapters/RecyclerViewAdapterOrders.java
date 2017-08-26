@@ -12,8 +12,11 @@ import com.example.vmm408.taxiuserproject.R;
 import com.example.vmm408.taxiuserproject.activities.MainActivity;
 import com.example.vmm408.taxiuserproject.models.OrderModel;
 
+import java.text.SimpleDateFormat;
 import java.util.ArrayList;
+import java.util.Calendar;
 import java.util.List;
+import java.util.Locale;
 
 import butterknife.BindView;
 import butterknife.ButterKnife;
@@ -21,6 +24,8 @@ import butterknife.ButterKnife;
 public class RecyclerViewAdapterOrders extends
         RecyclerView.Adapter<RecyclerViewAdapterOrders.CustomViewHolder> {
     private List<OrderModel> orderModelList = new ArrayList<>();
+    SimpleDateFormat dateFormat = new SimpleDateFormat("hh:mm:ss dd/MM/yyyy", Locale.getDefault());
+    Calendar calendar = Calendar.getInstance();
 
     public void addList(List<OrderModel> orderModelList) {
         this.orderModelList.addAll(orderModelList);
@@ -37,7 +42,12 @@ public class RecyclerViewAdapterOrders extends
     public void onBindViewHolder(CustomViewHolder holder, int position) {
         holder.textFromOrder.setText(orderModelList.get(position).getFromOrder());
         holder.textDestinationOrder.setText(orderModelList.get(position).getDestinationOrder());
-        holder.itemTextTime.setText(orderModelList.get(position).getTimeOrder());
+        holder.itemTextTime.setText(formatTime(position));
+    }
+
+    private String formatTime(int position) {
+        calendar.setTimeInMillis(Long.parseLong(orderModelList.get(position).getTimeOrder()) * 1000);
+        return String.valueOf(dateFormat.format(calendar.getTime()));
     }
 
     @Override
@@ -62,8 +72,7 @@ public class RecyclerViewAdapterOrders extends
                 Log.d("TAG", getAdapterPosition() + "");
                 new AlertDialog.Builder(itemView.getContext())
                         .setView(initOrderView(itemView, orderModelList.get(getAdapterPosition())))
-                        .setNeutralButton(itemView.getResources().getString(R.string.neutral_btn_back),
-                                (dialog, which) -> dialog.dismiss())
+                        .setNeutralButton(itemView.getResources().getString(R.string.btn_back_dialog), (dialog, which) -> dialog.dismiss())
                         .show();
             });
         }
@@ -71,6 +80,8 @@ public class RecyclerViewAdapterOrders extends
         private View initOrderView(View itemView, OrderModel model) {
             View currentOrderView = ((MainActivity) itemView.getContext())
                     .getLayoutInflater().inflate(R.layout.item_current_order, null);
+            TextView status = ButterKnife.findById(currentOrderView, R.id.text_status_order);
+            status.setVisibility(View.GONE);
             TextView from = ButterKnife.findById(currentOrderView, R.id.text_from_order);
             from.setText(model.getFromOrder());
             TextView destination = ButterKnife.findById(currentOrderView, R.id.text_destination_order);

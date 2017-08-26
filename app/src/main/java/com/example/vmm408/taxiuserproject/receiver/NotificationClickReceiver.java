@@ -9,6 +9,6 @@ import com.example.vmm408.taxiuserproject.activities.MainActivity;
 public class NotificationClickReceiver extends BroadcastReceiver {
     @Override
     public void onReceive(Context context, Intent intent) {
-        context.startActivity(new Intent(context, MainActivity.class));
+            context.startActivity(new Intent(context, MainActivity.class));
     }
 }

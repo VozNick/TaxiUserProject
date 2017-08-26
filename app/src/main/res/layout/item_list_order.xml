@@ -9,7 +9,7 @@
         android:id="@+id/text_from"
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
-        android:text="@string/item_text_from" />
+        android:text="@string/text_from_order" />
 
     <TextView
         android:id="@+id/text_from_order"
@@ -23,7 +23,7 @@
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
         android:layout_below="@id/text_from_order"
-        android:text="@string/item_text_destination" />
+        android:text="@string/text_destination_order" />
 
     <TextView
         android:id="@+id/text_destination_order"

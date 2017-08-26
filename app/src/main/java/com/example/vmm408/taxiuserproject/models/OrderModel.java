@@ -7,7 +7,7 @@ public class OrderModel {
     private String priceOrder;
     private String commentOrder;
     private String timeOrder;
-    private String orderAcceptedUser;
+    private String orderAcceptedDriver;
 
     public void setIdUserOrder(String idUserOrder) {
         this.idUserOrder = idUserOrder;
@@ -57,12 +57,12 @@ public class OrderModel {
         return timeOrder;
     }
 
-    public void setOrderAcceptedUser(String orderAcceptedUser) {
-        this.orderAcceptedUser = orderAcceptedUser;
+    public void setOrderAcceptedDriver(String orderAcceptedDriver) {
+        this.orderAcceptedDriver = orderAcceptedDriver;
     }
 
-    public String getOrderAcceptedUser() {
-        return orderAcceptedUser;
+    public String getOrderAcceptedDriver() {
+        return orderAcceptedDriver;
     }
 
     @Override
@@ -74,7 +74,7 @@ public class OrderModel {
                 ", priceOrder=" + priceOrder +
                 ", commentOrder='" + commentOrder + '\'' +
                 ", timeOrder=" + timeOrder +
-                ", orderAcceptedUser=" + orderAcceptedUser +
+                ", orderAcceptedDriver=" + orderAcceptedDriver +
                 '}';
     }
 

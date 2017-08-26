@@ -34,9 +34,9 @@ public class SettingsFragment extends BaseFragment {
     @OnClick(R.id.btn_sign_out)
     void btnSignOut() {
         new AlertDialog.Builder(getContext())
-                .setTitle(getResources().getString(R.string.alert_title_confirm_sign_out))
-                .setPositiveButton(getResources().getString(R.string.positive_btn_confirm), (dialog, which) -> signOut())
-                .setNegativeButton(getResources().getString(R.string.negative_btn_cancel), (dialog, which) -> dialog.dismiss())
+                .setMessage(getResources().getString(R.string.text_confirm_sign_out))
+                .setPositiveButton(getResources().getString(R.string.btn_confirm_dialog), (dialog, which) -> signOut())
+                .setNegativeButton(getResources().getString(R.string.btn_cancel_dialog), (dialog, which) -> dialog.dismiss())
                 .show();
     }
 

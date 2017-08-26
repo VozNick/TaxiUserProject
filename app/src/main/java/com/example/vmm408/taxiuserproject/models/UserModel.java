@@ -133,4 +133,16 @@ public class UserModel {
             return userModel;
         }
     }
+
+    public static class OrderAcceptedDriver {
+        private static UserModel userModel;
+
+        public static void setUserModel(UserModel userModel) {
+            OrderAcceptedDriver.userModel = userModel;
+        }
+
+        public static UserModel getUserModel() {
+            return userModel;
+        }
+    }
 }

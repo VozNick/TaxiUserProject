@@ -28,7 +28,6 @@ import android.widget.Toast;
 import com.example.vmm408.taxiuserproject.MyKeys;
 import com.example.vmm408.taxiuserproject.activities.MainActivity;
 import com.example.vmm408.taxiuserproject.R;
-import com.example.vmm408.taxiuserproject.eventBusModel.AppIsForegroundEventBusModel;
 import com.example.vmm408.taxiuserproject.models.OrderModel;
 import com.example.vmm408.taxiuserproject.models.UserModel;
 import com.example.vmm408.taxiuserproject.service.FirebaseService;
@@ -40,12 +39,10 @@ import com.google.android.gms.maps.GoogleMap;
 import com.google.android.gms.maps.SupportMapFragment;
 import com.google.android.gms.maps.model.CameraPosition;
 import com.google.android.gms.maps.model.LatLng;
+import com.google.android.gms.maps.model.LatLngBounds;
 import com.google.android.gms.maps.model.MarkerOptions;
 import com.google.firebase.database.DataSnapshot;
 import com.google.firebase.database.ValueEventListener;
-
-import org.greenrobot.eventbus.EventBus;
-
 import java.io.IOException;
 import java.util.ArrayList;
 import java.util.List;
@@ -61,6 +58,7 @@ import io.reactivex.schedulers.Schedulers;
 import static com.example.vmm408.taxiuserproject.FirebaseDataBaseKeys.CURRENT_ORDER_REF_KEY;
 import static com.example.vmm408.taxiuserproject.FirebaseDataBaseKeys.USERS_REF_KEY;
 import static com.example.vmm408.taxiuserproject.models.UserModel.SignedUser;
+import static com.example.vmm408.taxiuserproject.models.UserModel.OrderAcceptedDriver;
 import static com.example.vmm408.taxiuserproject.models.OrderModel.CurrentOrder;
 
 public class MapFragment extends BaseFragment {
@@ -95,30 +93,31 @@ public class MapFragment extends BaseFragment {
         public void onDataChange(DataSnapshot dataSnapshot) {
             if (dataSnapshot.getValue() != null) {
                 CurrentOrder.setOrderModel(dataSnapshot.getValue(OrderModel.class));
+                getOrderAcceptedUserFromBase();
                 getActivity().startService(new Intent(getContext(), FirebaseService.class));
             }
+            imBtnProfile.setClickable(true);
+            fabNewOrder.setClickable(true);
         }
     };
-    private DatabaseValueEventListener orderAcceptedUser = new DatabaseValueEventListener() {
+
+    private ValueEventListener orderAcceptedDriver = new DatabaseValueEventListener() {
         @Override
         public void onDataChange(DataSnapshot dataSnapshot) {
-
+            OrderAcceptedDriver.setUserModel(new UserModel());
+            OrderAcceptedDriver.setUserModel(dataSnapshot.getValue(UserModel.class));
         }
     };
+
+
     private GoogleMap.OnMapClickListener mapClickListener = new GoogleMap.OnMapClickListener() {
         @Override
         public void onMapClick(LatLng latLng) {
-//            textNewOrderWithDestination.setVisibility(View.GONE);
             map.clear();
             searchViewAppBar.clearFocus();
         }
     };
-    private GoogleMap.OnMarkerClickListener markerClickListener = marker -> {
-        LatLng markerClicked = new LatLng(marker.getPosition().latitude, marker.getPosition().longitude);
-        CameraPosition cameraPosition = new CameraPosition(markerClicked, 12f, 0f, 0f);
-        map.animateCamera(CameraUpdateFactory.newCameraPosition(cameraPosition));
-        return false;
-    };
+    private GoogleMap.OnMarkerClickListener markerClickListener = marker -> false;
     private SearchView.OnQueryTextListener onQueryTextListener = new SearchView.OnQueryTextListener() {
         @Override
         public boolean onQueryTextSubmit(String query) {
@@ -136,19 +135,6 @@ public class MapFragment extends BaseFragment {
             return false;
         }
     };
-
-    @Override
-    public void onStart() {
-        super.onStart();
-//        EventBus.getDefault().register(this);
-    }
-
-    @Override
-    public void onStop() {
-        super.onStop();
-//        EventBus.getDefault().unregister(this);
-        EventBus.getDefault().post(new AppIsForegroundEventBusModel(false));
-    }
 
     @Nullable
     @Override
@@ -185,16 +171,25 @@ public class MapFragment extends BaseFragment {
         }
     }
 
+    private void getOrderAcceptedUserFromBase() {
+        if (!CurrentOrder.getOrderModel().getOrderAcceptedDriver()
+                .equals(getResources().getString(R.string.text_status_order_not_accepted))) {
+            reference = database.getReference(USERS_REF_KEY)
+                    .child(CurrentOrder.getOrderModel().getOrderAcceptedDriver());
+            reference.addListenerForSingleValueEvent(orderAcceptedDriver);
+        }
+    }
+
     private void initAvatar() {
         String avatar;
         if (SignedUser.getUserModel() == null) {
-            imBtnProfile.setImageResource(R.mipmap.ic_launcher);
+            imBtnProfile.setImageResource(R.drawable.ic_person_black_24dp);
             return;
         } else {
             avatar = SignedUser.getUserModel().getAvatarUser();
         }
         if (avatar == null) {
-            imBtnProfile.setImageResource(R.mipmap.ic_launcher);
+            imBtnProfile.setImageResource(R.drawable.ic_person_black_24dp);
             return;
         }
         if (avatar.startsWith("https://lh3")) {
@@ -236,7 +231,7 @@ public class MapFragment extends BaseFragment {
                             android.R.layout.simple_list_item_1, searchAddressList));
                     searchAutoComplete.showDropDown();
                 },
-                throwable -> Log.e("ERROR", throwable + ""));
+                throwable -> Log.e("TAG", throwable + ""));
     }
 
     // permission is checked before this method. This warning is okay.
@@ -305,20 +300,12 @@ public class MapFragment extends BaseFragment {
 
     @OnClick(R.id.fab_new_order)
     void fabNewOrder() {
-//        textNewOrderWithDestination.setVisibility(View.GONE);
         if (CurrentOrder.getOrderModel() == null) {
             super.createNewOrderDialog();
-//            new CustomAlertDialog(getContext(), database, reference);
         } else {
             super.showCurrentOrderDialog(CurrentOrder.getOrderModel());
-//            new CustomAlertDialog(getContext(), CurrentOrder.getOrderModel());
         }
     }
-
-//    @OnClick(R.id.text_new_order_with_destination)
-//    void setTextNewOrderWithDestination() {
-//
-//    }
 
     @OnClick(R.id.fab_my_location)
     void fabMyLocation() {
@@ -332,16 +319,26 @@ public class MapFragment extends BaseFragment {
 
     private void initMarker(Object object) {
         map.clear();
+        LatLngBounds.Builder markerBounds = new LatLngBounds.Builder();
         if (geocoder == null) {
             geocoder = new Geocoder(getContext(), Locale.getDefault());
         }
         getAddressList(object).subscribe(addressList -> {
+            MarkerOptions markerOptions = null;
             for (int i = 0; i < addressList.size(); i++) {
-                map.addMarker(new MarkerOptions()
+                markerOptions = new MarkerOptions()
                         .position(new LatLng(addressList.get(i).getLatitude(), addressList.get(i).getLongitude()))
-                        .title(addressList.get(i).getAddressLine(0)));
+                        .title(addressList.get(i).getAddressLine(0));
+                map.addMarker(markerOptions);
+                markerBounds.include(markerOptions.getPosition());
             }
-        }, throwable -> Log.e("ERROR", throwable + ""));
+            if (addressList.size() == 1) {
+                CameraPosition cameraPosition = new CameraPosition(markerOptions.getPosition(), 12f, 0f, 0f);
+                map.animateCamera(CameraUpdateFactory.newCameraPosition(cameraPosition));
+                return;
+            }
+            map.animateCamera(CameraUpdateFactory.newLatLngBounds(markerBounds.build(), 50, 50, 5));
+        }, throwable -> Log.e("TAG", throwable + ""));
     }
 
     private Observable<List<Address>> getAddressList(Object object) {
@@ -361,7 +358,7 @@ public class MapFragment extends BaseFragment {
                 addressList = geocoder.getFromLocationName((String) object, 10);
             }
         } catch (IOException e) {
-            Log.e("ERROR", e + "");
+            Log.e("TAG", e + "");
         }
         return addressList;
     }

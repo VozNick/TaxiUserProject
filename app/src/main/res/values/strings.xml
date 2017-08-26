@@ -1,27 +1,43 @@
 <resources>
     <string name="app_name">TaxiUserProject</string>
 
+
+    // AlertDialog
+    <string name="title_new_order">New Order</string>
+
+    <string name="btn_create_dialog">CREATE ORDER</string>
+    <string name="btn_cancel_dialog">@android:string/cancel</string>
+    <string name="btn_edit_dialog">EDIT</string>
+    <string name="btn_delete_dialog">DELETE</string>
+    <string name="btn_back_dialog">BACK</string>
+    <string name="btn_confirm_dialog">CONFIRM</string>
+
+    <string name="text_confirm_sign_out">Confirm signOut</string>
+    <string name="text_confirm_delete">Confirm delete order</string>
+    <string name="text_confirm_delete_order">Order is accepted, delete anyway?</string>
+    <string name="text_status_order_not_accepted">Not Accepted</string>
+    <string name="text_from_order">From</string>
+    <string name="text_destination_order">Destination</string>
+    <string name="text_price_order">Price</string>
+    <string name="text_comment_order">Comment</string>
+
+
     // BaseFragment
     <string name="text_error_empty_fields">can\'t be empty fields</string>
-    <string name="text_error_phone_format">wrong phone format</string>
 
 
     // SignInFragment
     <string name="progress_dialog_msg">Authenticating…</string>
+    <string name="toast_connection_failed">connection failed</string>
+
+
+    // SaveProfileFragment
+    <string name="text_error_phone_format">Wrong phone format. Must contain 10 nums.</string>
 
 
     // MapFragment
     <string name="search_view_hint">Search here…</string>
-    <string name="positive_btn_edit">EDIT</string>
-    <string name="negative_btn_delete">DELETE</string>
-    <string name="neutral_btn_back">BACK</string>
     <string name="toast_turn_location">turn on location</string>
-
-
-    // SettingsFragment
-    <string name="alert_title_confirm_sign_out">Confirm signOut</string>
-    <string name="positive_btn_confirm">CONFIRM</string>
-    <string name="negative_btn_cancel">CANCEL</string>
 
 
     // item_menu_new_avatar
@@ -30,6 +46,19 @@
         <item>File</item>
         <item>Delete</item>
     </array>
+
+
+    // item_menu_profile
+    <array name="menu_profile">
+        <item>Profile</item>
+        <item>Rating</item>
+        <item>Orders history</item>
+        <item>Settings</item>
+    </array>
+
+
+    // fragment_google_sign_in
+    <string name="text_app_title">Taxi Perfect</string>
 
 
     // fragment_save_profile
@@ -45,37 +74,9 @@
     <string name="toast_load_photo_error">can`t load photo from gallery</string>
 
 
-    // fragment_create_order
-    <string name="hint_edit_text_order_from">From</string>
-    <string name="hint_edit_text_order_destination">Destination</string>
-    <string name="hint_edit_text_order_price">Price</string>
-    <string name="hint_edit_text_order_comment">Comment</string>
-    <string name="btn_create_order">Create Order</string>
-    <string name="btn_cancel_order">Cancel</string>
-
-
-    // item_menu_profile
-    <array name="menu_profile">
-        <item>Profile</item>
-        <item>Rating</item>
-        <item>Orders history</item>
-        <item>Settings</item>
-    </array>
-
-
-    // item_current_order
-    <string name="item_text_from">From</string>
-    <string name="item_text_destination">Destination</string>
-    <string name="item_text_price">Price</string>
-    <string name="item_text_comment">Comment</string>
-    <string name="tv_link_edit_order">Edit</string>
-    <string name="tv_link_delete_order">Delete</string>
-    <string name="text_status_order">Not Accepted</string>
-
-
     // fragment_orders_history
     <string name="text_current_order">Current order</string>
-    <string name="text_history_order">History Orders</string>
+    <string name="text_archive_orders">Archive Orders</string>
 
 
     // fragment_settings
@@ -89,13 +90,27 @@
         <item>українська</item>
     </array>
 
+
     <array name="sp_theme">
         <item>light</item>
         <item>dark</item>
     </array>
 
+
+    // fragment_driver_profile
+    <string name="text_driver_profile">Driver</string>
+    <string name="text_comment">Comments</string>
+    <string name="hint_full_name_driver">Full Name</string>
+    <string name="hint_gender_driver">Gender</string>
+    <string name="hint_age_driver">Age</string>
+    <string name="hint_phone_driver">Phone</string>
+    <string name="hint_experience_driver">Experience</string>
+    <string name="hint_car_model_driver">Car Model</string>
+    <string name="hint_num_plate_driver">Num Plate</string>
+
+    <string name="no_data_available">  ---  </string>
+
+
     <item name="visible" type="id" />
     <item name="masked" type="id" />
-
-
 </resources>

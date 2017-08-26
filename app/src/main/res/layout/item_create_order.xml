@@ -9,61 +9,61 @@
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
         android:orientation="vertical"
-        android:paddingLeft="@dimen/layout_padding_left"
-        android:paddingRight="@dimen/layout_padding_right"
+        android:paddingLeft="24dp"
+        android:paddingRight="24dp"
         android:paddingTop="24dp">
 
         <android.support.design.widget.TextInputLayout
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
-            android:layout_marginBottom="@dimen/et_margin_bottom"
-            android:layout_marginTop="@dimen/et_margin_top">
+            android:layout_marginBottom="8dp"
+            android:layout_marginTop="8dp">
 
             <EditText
                 android:id="@+id/edit_text_order_from"
                 android:layout_width="match_parent"
                 android:layout_height="wrap_content"
-                android:hint="@string/hint_edit_text_order_from" />
+                android:hint="@string/text_from_order" />
         </android.support.design.widget.TextInputLayout>
 
         <android.support.design.widget.TextInputLayout
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
-            android:layout_marginBottom="@dimen/et_margin_bottom"
-            android:layout_marginTop="@dimen/et_margin_top">
+            android:layout_marginBottom="8dp"
+            android:layout_marginTop="8dp">
 
             <EditText
                 android:id="@+id/edit_text_order_destination"
                 android:layout_width="match_parent"
                 android:layout_height="wrap_content"
-                android:hint="@string/hint_edit_text_order_destination" />
+                android:hint="@string/text_destination_order" />
         </android.support.design.widget.TextInputLayout>
 
         <android.support.design.widget.TextInputLayout
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
-            android:layout_marginBottom="@dimen/et_margin_bottom"
-            android:layout_marginTop="@dimen/et_margin_top">
+            android:layout_marginBottom="8dp"
+            android:layout_marginTop="8dp">
 
             <EditText
                 android:id="@+id/edit_text_order_price"
                 android:layout_width="match_parent"
                 android:layout_height="wrap_content"
-                android:hint="@string/hint_edit_text_order_price"
+                android:hint="@string/text_price_order"
                 android:inputType="number" />
         </android.support.design.widget.TextInputLayout>
 
         <android.support.design.widget.TextInputLayout
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
-            android:layout_marginBottom="@dimen/et_margin_bottom"
-            android:layout_marginTop="@dimen/et_margin_top">
+            android:layout_marginBottom="8dp"
+            android:layout_marginTop="8dp">
 
             <EditText
                 android:id="@+id/edit_text_order_comment"
                 android:layout_width="match_parent"
                 android:layout_height="wrap_content"
-                android:hint="@string/hint_edit_text_order_comment"
+                android:hint="@string/text_comment_order"
                 android:lines="3" />
         </android.support.design.widget.TextInputLayout>
     </LinearLayout>

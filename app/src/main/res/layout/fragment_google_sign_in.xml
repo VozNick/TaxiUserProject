@@ -7,7 +7,7 @@
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
         android:layout_centerInParent="true"
-        android:text="Taxi Perfect"
+        android:text="@string/text_app_title"
         android:textSize="50sp" />
 
 
@@ -17,8 +17,5 @@
         android:layout_height="wrap_content"
         android:layout_alignParentBottom="true"
         android:layout_centerInParent="true"
-        android:layout_marginBottom="50dp"
-        android:layout_marginLeft="20dp"
-        android:layout_marginRight="20dp"
-        android:visibility="visible" />
+        android:layout_marginBottom="50dp"/>
 </RelativeLayout>

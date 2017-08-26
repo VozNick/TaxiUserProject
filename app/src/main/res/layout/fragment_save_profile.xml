@@ -9,9 +9,9 @@
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
         android:orientation="vertical"
-        android:paddingLeft="@dimen/layout_padding_left"
-        android:paddingRight="@dimen/layout_padding_right"
-        android:paddingTop="@dimen/layout_padding_top">
+        android:paddingLeft="24dp"
+        android:paddingRight="24dp"
+        android:paddingTop="56dp">
 
         <RelativeLayout
             android:layout_width="wrap_content"
@@ -23,7 +23,7 @@
                 android:layout_width="96dp"
                 android:layout_height="96dp"
                 android:layout_gravity="center"
-                android:src="@mipmap/ic_launcher"
+                android:src="@drawable/ic_person_black_24dp"
                 app:civ_border_color="#FF000000"
                 app:civ_border_width="2dp" />
 
@@ -38,8 +38,8 @@
         <android.support.design.widget.TextInputLayout
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
-            android:layout_marginBottom="@dimen/et_margin_bottom"
-            android:layout_marginTop="@dimen/et_margin_top">
+            android:layout_marginBottom="8dp"
+            android:layout_marginTop="8dp">
 
             <EditText
                 android:id="@+id/edit_text_full_name"
@@ -52,8 +52,8 @@
         <android.support.design.widget.TextInputLayout
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
-            android:layout_marginBottom="@dimen/et_margin_bottom"
-            android:layout_marginTop="@dimen/et_margin_top">
+            android:layout_marginBottom="8dp"
+            android:layout_marginTop="8dp">
 
             <EditText
                 android:id="@+id/edit_text_phone"
@@ -67,17 +67,17 @@
             android:id="@+id/spinner_gender"
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
-            android:layout_marginBottom="@dimen/et_margin_bottom"
-            android:layout_marginTop="@dimen/et_margin_top"
+            android:layout_marginBottom="8dp"
+            android:layout_marginTop="8dp"
             android:entries="@array/gender" />
 
         <TextView
             android:id="@+id/text_age"
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
-            android:layout_marginBottom="@dimen/et_margin_bottom"
+            android:layout_marginBottom="8dp"
+            android:layout_marginTop="8dp"
             android:layout_marginLeft="5dp"
-            android:layout_marginTop="@dimen/et_margin_top"
             android:hint="@string/hint_birthday"
             android:textSize="20sp" />
 
@@ -85,15 +85,15 @@
             android:id="@+id/btn_save_profile"
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
-            android:layout_marginTop="@dimen/button_margin_top"
-            android:padding="@dimen/button_padding"
+            android:layout_marginTop="24dp"
+            android:padding="12dp"
             android:text="@string/btn_save" />
 
         <android.support.v7.widget.AppCompatButton
             android:id="@+id/btn_cancel_profile"
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
-            android:padding="@dimen/button_padding"
+            android:padding="12dp"
             android:text="@string/btn_cancel"
             android:visibility="gone" />
     </LinearLayout>

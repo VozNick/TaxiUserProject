@@ -17,10 +17,4 @@ public class MyKeys {
     public static final int IMAGE_CAPTURE_KEY = 0;
     public static final int PICK_PHOTO_KEY = 1;
     public static final int DELETE_PHOTO_KEY = 2;
-
-    public static final String RETURN_TO_POSITION_KEY = "positionInRecyclerView";
-
-    public static final String CURRENT_ORDER_DIALOG = "currentOrderDialog";
-    public static final String NEW_ORDER_DIALOG = "newOrderDialog";
-
 }

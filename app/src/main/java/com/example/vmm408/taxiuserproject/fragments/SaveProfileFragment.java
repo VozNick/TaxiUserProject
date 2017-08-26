@@ -16,7 +16,6 @@ import android.support.annotation.RequiresApi;
 import android.support.v4.app.ActivityCompat;
 import android.support.v7.app.AlertDialog;
 import android.util.Base64;
-import android.util.Patterns;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
@@ -126,10 +125,10 @@ public class SaveProfileFragment extends BaseFragment {
     }
 
     private void initAvatar() {
-            String avatar = SignedUser.getUserModel().getAvatarUser();
+        String avatar = SignedUser.getUserModel().getAvatarUser();
         if (avatar == null) {
-            imageUserAvatar.setImageResource(R.mipmap.ic_launcher);
-        } else if (avatar.startsWith("https://lh3.googleusercontent.com/")) {
+            imageUserAvatar.setImageResource(R.drawable.ic_person_black_24dp);
+        } else if (avatar.startsWith("https://lh3")) {
             googlePhotoPath = avatar;
             super.loadPhotoUrl(avatar, imageUserAvatar);
         } else {
@@ -179,7 +178,7 @@ public class SaveProfileFragment extends BaseFragment {
         } else if (key == MyKeys.PICK_PHOTO_KEY) {
             startActivityForResult(new Intent(Intent.ACTION_PICK, MediaStore.Images.Media.INTERNAL_CONTENT_URI), key);
         } else {
-            imageUserAvatar.setImageResource(R.mipmap.ic_launcher);
+            imageUserAvatar.setImageResource(R.drawable.ic_person_black_24dp);
             bitmapAvatar = null;
             googlePhotoPath = null;
         }
@@ -226,7 +225,7 @@ public class SaveProfileFragment extends BaseFragment {
     }
 
     private boolean validatePhone() {
-        if (!Patterns.PHONE.matcher(etPhone.getText().toString()).matches()) {
+        if (!etPhone.getText().toString().matches("\\d{10}")) {
             etPhone.setError(getString(R.string.text_error_phone_format));
             return false;
         }
