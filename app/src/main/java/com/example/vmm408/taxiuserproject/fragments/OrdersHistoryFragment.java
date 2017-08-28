@@ -26,7 +26,7 @@ import java.util.List;
 import butterknife.BindView;
 import butterknife.OnClick;
 
-import static com.example.vmm408.taxiuserproject.FirebaseDataBaseKeys.ORDERS_REF_KEY;
+import static com.example.vmm408.taxiuserproject.utils.FirebaseDataBaseKeys.ORDERS_REF_KEY;
 import static com.example.vmm408.taxiuserproject.models.UserModel.SignedUser;
 import static com.example.vmm408.taxiuserproject.models.OrderModel.CurrentOrder;
 

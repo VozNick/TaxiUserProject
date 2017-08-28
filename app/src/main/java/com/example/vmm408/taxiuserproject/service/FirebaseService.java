@@ -19,8 +19,8 @@ import com.google.firebase.database.DataSnapshot;
 import com.google.firebase.database.DatabaseReference;
 import com.google.firebase.database.FirebaseDatabase;
 
-import static com.example.vmm408.taxiuserproject.FirebaseDataBaseKeys.CURRENT_ORDER_REF_KEY;
-import static com.example.vmm408.taxiuserproject.FirebaseDataBaseKeys.USERS_REF_KEY;
+import static com.example.vmm408.taxiuserproject.utils.FirebaseDataBaseKeys.CURRENT_ORDER_REF_KEY;
+import static com.example.vmm408.taxiuserproject.utils.FirebaseDataBaseKeys.USERS_REF_KEY;
 import static com.example.vmm408.taxiuserproject.models.OrderModel.CurrentOrder;
 import static com.example.vmm408.taxiuserproject.models.UserModel.OrderAcceptedDriver;
 

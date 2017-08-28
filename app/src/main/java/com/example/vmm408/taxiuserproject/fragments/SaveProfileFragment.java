@@ -24,7 +24,7 @@ import android.widget.EditText;
 import android.widget.Spinner;
 import android.widget.TextView;
 
-import com.example.vmm408.taxiuserproject.MyKeys;
+import com.example.vmm408.taxiuserproject.utils.MyKeys;
 import com.example.vmm408.taxiuserproject.R;
 import com.example.vmm408.taxiuserproject.activities.MainActivity;
 import com.example.vmm408.taxiuserproject.models.UserModel;
@@ -39,7 +39,7 @@ import butterknife.OnClick;
 import de.hdodenhof.circleimageview.CircleImageView;
 import id.zelory.compressor.Compressor;
 
-import static com.example.vmm408.taxiuserproject.FirebaseDataBaseKeys.USERS_REF_KEY;
+import static com.example.vmm408.taxiuserproject.utils.FirebaseDataBaseKeys.USERS_REF_KEY;
 import static com.example.vmm408.taxiuserproject.models.UserModel.SignedUser;
 
 public class SaveProfileFragment extends BaseFragment {

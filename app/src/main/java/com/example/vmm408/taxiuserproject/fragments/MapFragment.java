@@ -25,7 +25,7 @@ import android.widget.ImageView;
 import android.widget.LinearLayout;
 import android.widget.Toast;
 
-import com.example.vmm408.taxiuserproject.MyKeys;
+import com.example.vmm408.taxiuserproject.utils.MyKeys;
 import com.example.vmm408.taxiuserproject.activities.MainActivity;
 import com.example.vmm408.taxiuserproject.R;
 import com.example.vmm408.taxiuserproject.models.OrderModel;
@@ -55,8 +55,8 @@ import io.reactivex.Observable;
 import io.reactivex.android.schedulers.AndroidSchedulers;
 import io.reactivex.schedulers.Schedulers;
 
-import static com.example.vmm408.taxiuserproject.FirebaseDataBaseKeys.CURRENT_ORDER_REF_KEY;
-import static com.example.vmm408.taxiuserproject.FirebaseDataBaseKeys.USERS_REF_KEY;
+import static com.example.vmm408.taxiuserproject.utils.FirebaseDataBaseKeys.CURRENT_ORDER_REF_KEY;
+import static com.example.vmm408.taxiuserproject.utils.FirebaseDataBaseKeys.USERS_REF_KEY;
 import static com.example.vmm408.taxiuserproject.models.UserModel.SignedUser;
 import static com.example.vmm408.taxiuserproject.models.UserModel.OrderAcceptedDriver;
 import static com.example.vmm408.taxiuserproject.models.OrderModel.CurrentOrder;

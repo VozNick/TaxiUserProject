@@ -28,8 +28,8 @@ import butterknife.ButterKnife;
 import butterknife.Unbinder;
 import de.hdodenhof.circleimageview.CircleImageView;
 
-import static com.example.vmm408.taxiuserproject.FirebaseDataBaseKeys.CURRENT_ORDER_REF_KEY;
-import static com.example.vmm408.taxiuserproject.FirebaseDataBaseKeys.ORDERS_REF_KEY;
+import static com.example.vmm408.taxiuserproject.utils.FirebaseDataBaseKeys.CURRENT_ORDER_REF_KEY;
+import static com.example.vmm408.taxiuserproject.utils.FirebaseDataBaseKeys.ORDERS_REF_KEY;
 import static com.example.vmm408.taxiuserproject.models.OrderModel.CurrentOrder;
 import static com.example.vmm408.taxiuserproject.models.UserModel.OrderAcceptedDriver;
 

@@ -1,4 +1,4 @@
-package com.example.vmm408.taxiuserproject;
+package com.example.vmm408.taxiuserproject.utils;
 
 public class MyKeys {
     public static final int SIGN_IN_KEY = 9001;
